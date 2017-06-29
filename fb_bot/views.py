@@ -7,4 +7,7 @@ from django.shortcuts import render
 # Create your views here.
 class FbBotView(generic.View):
     def get(self, request, *args, **kwargs):
-        return HttpResponse("Hello World!")
+        if self.request.GET['hub.verify_token'] == '123456789123456789':
+            return HttpResponse(self.request.GET['hub.challenge'])
+        else:
+            return HttpResponse("Error, invalid token")
