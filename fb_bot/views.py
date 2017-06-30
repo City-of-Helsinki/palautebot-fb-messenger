@@ -12,11 +12,18 @@ from chatbot import settings
 
 # Create your views here.
 class FbBotView(generic.View):
+
     def get(self, request, *args, **kwargs):
         if self.request.GET['hub.verify_token'] == '123456789123456789':
             return HttpResponse(self.request.GET['hub.challenge'])
         else:
             return HttpResponse("Error, invalid token")
+
+    def set_welcome_message(self, request, *args, **kwargs):
+        post_message_url = 'https://graph.facebook.com/v2.6/me/thread_settings?access_token=%s' %(settings.FACEBOOK_PAGE_ACCESS_TOKEN)
+        response_msg = json.dumps({"setting_type":"greeting","greeting":{"text": "This is greeting text"}})
+        status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
+        pprint(status.json())
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
