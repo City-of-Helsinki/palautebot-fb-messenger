@@ -4,8 +4,10 @@ from django.views import generic
 from django.http.response import HttpResponse
 from django.shortcuts import render
 
-# import requests
-
+import json, requests, random, re
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from pprint import pprint
 
 # Create your views here.
 class FbBotView(generic.View):
