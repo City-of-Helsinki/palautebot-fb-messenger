@@ -8,6 +8,7 @@ import json, requests, random, re
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from pprint import pprint
+from chatbot.settings import FACEBOOK_PAGE_ACCESS_TOKEN
 
 # Create your views here.
 class FbBotView(generic.View):
@@ -39,7 +40,7 @@ class FbBotView(generic.View):
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
-    post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=<page-access-token>' 
+    post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=settings.FACEBOOK_PAGE_ACCESS_TOKEN'
     response_msg = json.dumps({"recipient":{"id":fbid}, "message":{"text":recevied_message}})
     status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
     pprint(status.json())
