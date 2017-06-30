@@ -32,10 +32,10 @@ class FbBotView(generic.View):
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message:
-                pprint(message)
-                # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
-                # are sent as attachments and must be handled accordingly. 
-                post_facebook_message(message['sender']['id'], message['message']['text'])
+                    pprint(message)
+                    # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
+                    # are sent as attachments and must be handled accordingly. 
+                    post_facebook_message(message['sender']['id'], message['message']['text'])
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
