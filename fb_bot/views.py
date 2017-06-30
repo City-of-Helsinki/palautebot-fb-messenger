@@ -40,7 +40,7 @@ class FbBotView(generic.View):
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
-    post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=settings.FACEBOOK_PAGE_ACCESS_TOKEN'
+    post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=%s' %(settings.FACEBOOK_PAGE_ACCESS_TOKEN)
     response_msg = json.dumps({"recipient":{"id":fbid}, "message":{"text":recevied_message}})
     status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
     pprint(status.json())
