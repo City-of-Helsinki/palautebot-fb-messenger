@@ -32,6 +32,18 @@ class FbBotView(generic.View):
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message:
-                    # Print the message to the terminal
-                    pprint(message)
+                pprint(message)
+                # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
+                # are sent as attachments and must be handled accordingly. 
+                post_facebook_message(message['sender']['id'], message['message']['text'])
         return HttpResponse()
+
+    def post(self, request, *args, **kwargs):
+    # .....code omitted for brevity......
+                
+
+def post_facebook_message(fbid, recevied_message):
+    post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=<page-access-token>' 
+    response_msg = json.dumps({"recipient":{"id":fbid}, "message":{"text":recevied_message}})
+    status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
+    pprint(status.json())
