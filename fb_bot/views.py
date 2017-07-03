@@ -29,6 +29,7 @@ class FbBotView(generic.View):
         return generic.View.dispatch(self, request, *args, **kwargs)
 
     def init_feedback(self):
+        feedback = {}
         feedback['title'] = 'Facebook messenger feedback'
         feedback['address'] = ''
         feedback['description'] = ''
