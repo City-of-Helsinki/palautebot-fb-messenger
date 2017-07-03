@@ -32,7 +32,6 @@ class FbBotView(generic.View):
     def post(self, request, *args, **kwargs):
         # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
-        counter++
         # Facebook recommends going through every entry since they might send
         # multiple messages in a single call during high load
         for entry in incoming_message['entry']:
@@ -41,7 +40,6 @@ class FbBotView(generic.View):
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message:
                     pprint(message)
-                    pprint('###########', counter)
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly. 
                     post_facebook_message(message['sender']['id'], message['message']['text'])
