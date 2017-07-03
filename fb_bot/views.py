@@ -53,12 +53,11 @@ class FbBotView(generic.View):
             decline_answers = ['ei', 'e']
             for user_input in accept_answers:
                 return True
-            elif user_input in decline_answers:
+            for user_input in decline_answers:
                 # feedback['phase'] = phase+2
                 # save_to_database(feedback)
-                return False
-            else:
-                return False
+                return True
+            return False
 
         elif phase == 2:
             #Tarkistetaan, että Käyttäjä on lisännyt kuvan joko puhelimestaan tai suorana linkkinä.
