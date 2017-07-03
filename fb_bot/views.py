@@ -45,7 +45,7 @@ class FbBotView(generic.View):
             user_input = user_input['message']['text'].lower()
         except KeyError:
             if phase == 2 or phase == 4:
-                pass:
+                pass
             else:
                 return False
         if phase == 0:
