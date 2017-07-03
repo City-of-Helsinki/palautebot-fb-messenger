@@ -41,7 +41,13 @@ class FbBotView(generic.View):
         return feedback
 
     def check_input(self, phase, user_input):
-        user_input = user_input.lower()
+        try:
+            user_input = user_input['message']['text'].lower()
+        except KeyError:
+            if phase == 2 or phase == 4:
+                pass:
+            else:
+                return False
         if phase == 0:
             string_length = len(user_input)
             if (string_length > 10) and (string_length < 5000):
@@ -68,6 +74,9 @@ class FbBotView(generic.View):
         #     # Tarkistetaan, että käyttäjä on kirjoittanut jonkin osoitteen
         return True
 
+['message']['text']
+
+
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
         feedback = self.init_feedback()
@@ -81,7 +90,9 @@ class FbBotView(generic.View):
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message:
                     pprint(message)
-                    if (self.check_input(0, message['message']['text'])):
+
+
+                    if (self.check_input(0, message)):
                         post_facebook_message(message['sender']['id'], feedback['title'])
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly. 
