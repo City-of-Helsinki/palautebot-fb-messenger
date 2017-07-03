@@ -42,7 +42,11 @@ class FbBotView(generic.View):
                     pprint(message)
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly. 
-                    post_facebook_message(message['sender']['id'], message['message']['text'])
+                    
+                    if message['message']['text'] == 'echo':
+                        post_facebook_message(message['sender']['id'], message['message']['text'])
+                    else:
+                        post_facebook_message(message['sender']['id'], 'couldn\'t echo that')
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
