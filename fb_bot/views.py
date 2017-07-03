@@ -49,6 +49,7 @@ class FbBotView(generic.View):
             return False
 
         elif phase == 1 or phase == 3 or phase == 5:
+            user_input.strip(',.-!?:;')
             accept_answers = ['kyllä', 'joo', 'juu', 'k']
             decline_answers = ['ei', 'e']
             for user_input in accept_answers:
@@ -80,7 +81,7 @@ class FbBotView(generic.View):
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message:
                     pprint(message)
-                    if (self.check_input(0), message['message']['text']):
+                    if (self.check_input(0, message['message']['text'])):
                         post_facebook_message(message['sender']['id'], feedback['title'])
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly. 
