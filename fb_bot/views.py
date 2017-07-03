@@ -41,7 +41,7 @@ class FbBotView(generic.View):
 
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
-        feedback = init_feedback()
+        feedback = self.init_feedback()
         # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
