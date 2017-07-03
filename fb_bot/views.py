@@ -28,8 +28,20 @@ class FbBotView(generic.View):
     def dispatch(self, request, *args, **kwargs):
         return generic.View.dispatch(self, request, *args, **kwargs)
 
+    def init_feedback(self):
+        feedback['title'] = 'Facebook messenger feedback'
+        feedback['address'] = ''
+        feedback['description'] = ''
+        feedback['phase'] = 0
+        feedback['lat'] = ''
+        feedback['long'] = ''
+        feedback['media'] = ''
+        feedback['timestamp'] = ''
+        return feedback
+
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
+        feedback = init_feedback()
         # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
@@ -43,10 +55,15 @@ class FbBotView(generic.View):
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly. 
                     
-                    if message['message']['text'] == 'echo':
-                        post_facebook_message(message['sender']['id'], message['message']['text'])
-                    else:
-                        post_facebook_message(message['sender']['id'], 'couldn\'t echo that')
+
+                    post_facebook_message(message['sender']['id'], feedback['title'])
+
+
+
+                    # if message['message']['text'] == 'echo':
+                    #     post_facebook_message(message['sender']['id'], message['message']['text'])
+                    # else:
+                    #     post_facebook_message(message['sender']['id'], 'couldn\'t echo that')
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
