@@ -40,7 +40,7 @@ class FbBotView(generic.View):
         feedback['timestamp'] = ''
         return feedback
 
-    def check_input(phase,user_input):
+    def check_input(self, phase, user_input):
         user_input = user_input.lower()
         if phase == 0:
             string_length = len(user_input)
