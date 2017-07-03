@@ -59,12 +59,12 @@ class FbBotView(generic.View):
                 return True
             return False
 
-        elif phase == 2:
-            #Tarkistetaan, että Käyttäjä on lisännyt kuvan joko puhelimestaan tai suorana linkkinä.
-        elif phase == 4:
-            # Tarkistetaan, että käyttäjä on jakanut sijainnin
-        elif phase == 6:
-            # Tarkistetaan, että käyttäjä on kirjoittanut jonkin osoitteen
+        # elif phase == 2:
+        #     #Tarkistetaan, että Käyttäjä on lisännyt kuvan joko puhelimestaan tai suorana linkkinä.
+        # elif phase == 4:
+        #     # Tarkistetaan, että käyttäjä on jakanut sijainnin
+        # elif phase == 6:
+        #     # Tarkistetaan, että käyttäjä on kirjoittanut jonkin osoitteen
         return True
 
     # Post function to handle Facebook messages
