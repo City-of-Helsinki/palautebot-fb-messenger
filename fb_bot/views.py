@@ -74,9 +74,6 @@ class FbBotView(generic.View):
         #     # Tarkistetaan, että käyttäjä on kirjoittanut jonkin osoitteen
         return True
 
-['message']['text']
-
-
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
         feedback = self.init_feedback()
