@@ -13,6 +13,7 @@ from pprint import pprint
 import json
 import pytz
 import requests
+import time
 
 # Create your views here.
 class FbBotView(generic.View):
@@ -94,8 +95,7 @@ class FbBotView(generic.View):
 
                     if self.check_input(0, message):
                         timezone = pytz.timezone('Europe/Helsinki')
-                        utc_dt = datetime.utcfromtimestamp(message['timestamp']).replace(tzinfo=pytz.utc)
-                        feedback_start_at = timezone.normalize(utc_dt.astimezone(timezone))
+                        feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000, timezone)
                         feedback_object, created = Feedback.objects.update_or_create(
                             source_created_at=feedback_start_at,
                             user_id=message['sender']['id'],
