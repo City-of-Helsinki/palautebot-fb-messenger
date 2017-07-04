@@ -90,14 +90,10 @@ class FbBotView(generic.View):
         return True
 
     def get_phase(self, message):
-        # records = Feedback.objects.raw('SELECT id, phase, source_created_at, user_id WHERE user_id=%s ORDER BY source_created_at ASC LIMIT 1'%(message['sender']['id']))
-        records = Feedback.objects.order_by('source_created_at')[1]
-        dir(records)
-        vars(records)
-        pprint(records)
-        # for r in records:
-        #     pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (r.id, r.phase, r.source_created_at, r.user_id))
-        # # if newest_record['phase'] !=
+        # records = Feedback.objects.order_by('source_created_at')[1]
+        r = Feedback.objects.filter(user_id=message['sender']['id']).latest('source_created_at')
+        pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (r.id, r.phase, r.source_created_at, r.user_id))
+        # if newest_record['phase'] !=
         return 0
 
 
