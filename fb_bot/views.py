@@ -91,10 +91,10 @@ class FbBotView(generic.View):
 
     def get_phase(self, message):
         Feedback.objects
-        records = Feedback.objects.raw('SELECT phase, source_created_at, user_id WHERE user_id=%s ORDER BY source_created_at ASC LIMIT 1'%(message['sender']['id']))
+        records = Feedback.objects.raw('SELECT fb_bot.id, fb_bot.phase, fb_bot.source_created_at, fb_bot.user_id WHERE user_id=%s ORDER BY source_created_at ASC LIMIT 1'%(message['sender']['id']))
         # newest_record = Feedback.objects.order_by('source_created_at')[0]
         for r in records:
-            pprint('phase: %s\nsource_created_at: %s\nuser_id: %s' % (r.phase, r.source_created_at, r.user_id))
+            pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (r.id, r.phase, r.source_created_at, r.user_id))
         # if newest_record['phase'] !=
         return 0
 
