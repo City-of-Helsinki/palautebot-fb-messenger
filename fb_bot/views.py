@@ -90,8 +90,8 @@ class FbBotView(generic.View):
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
         # multiple messages in a single call during high load
+        pprint(incoming_message)
         for entry in incoming_message['entry']:
-            pprint(entry)
             for message in entry['messaging']:
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
