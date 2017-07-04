@@ -47,7 +47,7 @@ class FbBotView(generic.View):
 
     def check_input(self, phase, user_input):
         try:
-            user_input = user_input['message']['text'].lower()
+            user_input = user_input['message']['text']
         except KeyError:
             if phase == 2 or phase == 4:
                 try:
@@ -69,7 +69,8 @@ class FbBotView(generic.View):
             return False
 
         elif phase == 1 or phase == 3 or phase == 5:
-            user_input.strip(',.-!?:;')
+            user_input = user_input.lower()
+            user_input = user_input.strip(',.-!?:;')
             accept_answers = ['kyllä', 'joo', 'juu', 'k']
             decline_answers = ['ei', 'e']
             for user_input in accept_answers:
@@ -101,9 +102,8 @@ class FbBotView(generic.View):
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message and 'sender' != '204695756714834':
-                    pprint(message)
-
                     if self.check_input(0, message):
+                        pprint('check_input == true')
                         feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
                         feedback_object, created = Feedback.objects.update_or_create(
                             source_created_at=feedback_start_at,
@@ -115,6 +115,8 @@ class FbBotView(generic.View):
                         )
                         if created is True:
                             post_facebook_message(message['sender']['id'], feedback['title'])
+                    else:
+                        pprint('check_input == false')
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly. 
 
