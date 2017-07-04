@@ -94,9 +94,10 @@ class FbBotView(generic.View):
         records = Feedback.objects.order_by('source_created_at')[1]
         dir(records)
         vars(records)
-        for r in records:
-            pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (r.id, r.phase, r.source_created_at, r.user_id))
-        # if newest_record['phase'] !=
+        pprint(records)
+        # for r in records:
+        #     pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (r.id, r.phase, r.source_created_at, r.user_id))
+        # # if newest_record['phase'] !=
         return 0
 
 
