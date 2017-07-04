@@ -46,6 +46,10 @@ class FbBotView(generic.View):
         return feedback
 
     def check_input(self, phase, user_input):
+        bot_messages = ['Facebook messenger feedback']
+        for user_input in bot_messages:
+            pprint("check_input bot message detected and working")
+            return False
         try:
             user_input = user_input['message']['text'].lower()
         except KeyError:
@@ -87,6 +91,7 @@ class FbBotView(generic.View):
         # Facebook recommends going through every entry since they might send
         # multiple messages in a single call during high load
         for entry in incoming_message['entry']:
+            pprint(entry)
             for message in entry['messaging']:
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
@@ -94,7 +99,6 @@ class FbBotView(generic.View):
                     pprint(message)
 
                     if self.check_input(0, message):
-                        # timezone = pytz.timezone('Europe/Helsinki')
                         feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
                         feedback_object, created = Feedback.objects.update_or_create(
                             source_created_at=feedback_start_at,
