@@ -46,17 +46,22 @@ class FbBotView(generic.View):
         return feedback
 
     def check_input(self, phase, user_input):
-        bot_messages = ['Facebook messenger feedback']
-        for user_input in bot_messages:
-            pprint("check_input bot message detected and working")
-            return False
         try:
             user_input = user_input['message']['text'].lower()
         except KeyError:
             if phase == 2 or phase == 4:
-                pass
+                try:
+                    user_input = user_input['message']['attachments']
+                except KeyError:
+                    return False
             else:
                 return False
+
+        bot_messages = ['Facebook messenger feedback']
+        for user_input in bot_messages:
+            pprint("check_input bot message detected and working")
+            return False
+
         if phase == 0:
             string_length = len(user_input)
             if (string_length > 10) and (string_length < 5000):
