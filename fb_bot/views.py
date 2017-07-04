@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.views import generic
 from django.http.response import HttpResponse
 from django.shortcuts import render
-
+from fb_bot.models import Feedback
 import json, requests, random, re
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -88,9 +88,17 @@ class FbBotView(generic.View):
                 if 'message' in message:
                     pprint(message)
 
-
-                    if (self.check_input(0, message)):
-                        post_facebook_message(message['sender']['id'], feedback['title'])
+                    if self.check_input(0, message):
+                        feedback_object, created = Feedback.objects.update_or_create(
+                            source_created_at=message['timestamp'],
+                            user_id=message['sender']['id'],
+                            defaults={
+                                'message': message['message']['text'],
+                                'phase': 0
+                            }
+                        )
+                        if created is True:
+                            post_facebook_message(message['sender']['id'], feedback['title'])
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly. 
 
