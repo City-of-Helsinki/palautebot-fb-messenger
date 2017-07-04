@@ -89,6 +89,13 @@ class FbBotView(generic.View):
         #     # Tarkistetaan, että käyttäjä on kirjoittanut jonkin osoitteen
         return True
 
+    def get_phase(self, message):
+        Feedback.objects
+        query = Feedback.objects.get(user_id = message['sender']['id'])[:1]
+        newest_record = Feedback.objects.order_by('source_created_at')[0]
+        pprint(newest_record)
+
+
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
         feedback = self.init_feedback()
@@ -102,7 +109,8 @@ class FbBotView(generic.View):
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message and 'sender' != '204695756714834':
-                    if self.check_input(0, message):
+                    feedback['phase'] = get_phase():
+                    if self.check_input(feedback['phase'], message):
                         pprint('check_input == true')
                         feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
                         feedback_object, created = Feedback.objects.update_or_create(
@@ -110,7 +118,7 @@ class FbBotView(generic.View):
                             user_id=message['sender']['id'],
                             defaults={
                                 'message': message['message']['text'],
-                                'phase': 0
+                                'phase': feedback['phase']
                             }
                         )
                         if created is True:
