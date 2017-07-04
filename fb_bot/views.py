@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.views import generic
+from chatbot import settings
+from datetime import datetime
 from django.http.response import HttpResponse
 from django.shortcuts import render
-from fb_bot.models import Feedback
-import json, requests, random, re
-from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
+from fb_bot.models import Feedback
 from pprint import pprint
-from chatbot import settings
+
+import json
+import pytz
+import requests
 
 # Create your views here.
 class FbBotView(generic.View):
 
-    post_message_url = 'https://graph.facebook.com/v2.6/me/thread_settings?access_token=%s' %(settings.FACEBOOK_PAGE_ACCESS_TOKEN)
-    response_msg = json.dumps({"setting_type":"greeting","greeting":{"text": "This is greeting text"}})
-    status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
-    pprint(status.json())
+    # post_message_url = 'https://graph.facebook.com/v2.6/me/thread_settings?access_token=%s' %(settings.FACEBOOK_PAGE_ACCESS_TOKEN)
+    # response_msg = json.dumps({"setting_type":"greeting","greeting":{"text": "This is greeting text"}})
+    # status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
+    # pprint(status.json())
 
     def get(self, request, *args, **kwargs):
         if self.request.GET['hub.verify_token'] == '123456789123456789':
@@ -89,8 +93,11 @@ class FbBotView(generic.View):
                     pprint(message)
 
                     if self.check_input(0, message):
+
+                        timezone = pytz.timezone('Europe/Helsinki')
+                        feedback_start_at = datetime.fromtimestamp(message['timestamp'], timezone)
                         feedback_object, created = Feedback.objects.update_or_create(
-                            source_created_at=message['timestamp'],
+                            source_created_at=feedback_start_at,
                             user_id=message['sender']['id'],
                             defaults={
                                 'message': message['message']['text'],
