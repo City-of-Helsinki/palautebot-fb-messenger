@@ -92,7 +92,7 @@ class FbBotView(generic.View):
     def get_phase(self, message):
         # records = Feedback.objects.raw('SELECT id, phase, source_created_at, user_id WHERE user_id=%s ORDER BY source_created_at ASC LIMIT 1'%(message['sender']['id']))
         records = Feedback.objects.order_by('source_created_at')[1]
-        __dir__(records)
+        dir(records)
         vars(records)
         for r in records:
             pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (r.id, r.phase, r.source_created_at, r.user_id))
