@@ -94,6 +94,7 @@ class FbBotView(generic.View):
 
         user = message['sender']['id']
         pprint(type(user))
+        pprint(dir(user))
         r = Feedback.objects.filter(user_id=user).latest('source_created_at')
         pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (r.id, r.phase, r.source_created_at, r.user_id))
         # if newest_record['phase'] !=
