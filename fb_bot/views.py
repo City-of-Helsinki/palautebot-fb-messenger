@@ -58,7 +58,7 @@ class FbBotView(generic.View):
                 return False
 
         bot_messages = ['Facebook messenger feedback']
-        for user_input in bot_messages:
+        if any(user_input in s for s in bot_messages):
             pprint("check_input bot message detected and working")
             return False
 
