@@ -90,7 +90,7 @@ class FbBotView(generic.View):
             for message in entry['messaging']:
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
-                if 'message' in message:
+                if 'message' in message and 'sender' != '204695756714834':
                     pprint(message)
 
                     if self.check_input(0, message):
