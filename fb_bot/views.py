@@ -109,7 +109,7 @@ class FbBotView(generic.View):
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message and 'sender' != '204695756714834':
-                    feedback['phase'] = get_phase():
+                    feedback['phase'] = get_phase()
                     if self.check_input(feedback['phase'], message):
                         pprint('check_input == true')
                         feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
