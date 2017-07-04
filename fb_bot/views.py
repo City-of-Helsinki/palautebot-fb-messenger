@@ -17,7 +17,7 @@ import time
 
 # Create your views here.
 class FbBotView(generic.View):
-
+    # WELCOME MESSAGE
     # post_message_url = 'https://graph.facebook.com/v2.6/me/thread_settings?access_token=%s' %(settings.FACEBOOK_PAGE_ACCESS_TOKEN)
     # response_msg = json.dumps({"setting_type":"greeting","greeting":{"text": "This is greeting text"}})
     # status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
@@ -94,8 +94,8 @@ class FbBotView(generic.View):
                     pprint(message)
 
                     if self.check_input(0, message):
-                        timezone = pytz.timezone('Europe/Helsinki')
-                        feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000, timezone)
+                        # timezone = pytz.timezone('Europe/Helsinki')
+                        feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
                         feedback_object, created = Feedback.objects.update_or_create(
                             source_created_at=feedback_start_at,
                             user_id=message['sender']['id'],
