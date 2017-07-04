@@ -5,7 +5,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
-class Feedback(models.Model)
+class Feedback(models.Model):
 
     user_id = models.CharField(max_length=2048)
     phase = models.IntegerField(default=0, validators=[
