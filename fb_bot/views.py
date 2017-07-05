@@ -148,15 +148,8 @@ class FbBotView(generic.View):
                             post_facebook_message(message['sender']['id'], feedback['title'])
                     else:
                         pprint('check_input == false')
+                        pprint(message['sender']['id'])
                         post_facebook_message(message['sender']['id'], 'Check input didn\'t pass')
-                    # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
-                    # are sent as attachments and must be handled accordingly. 
-
-
-                    # if message['message']['text'] == 'echo':
-                    #     post_facebook_message(message['sender']['id'], message['message']['text'])
-                    # else:
-                    #     post_facebook_message(message['sender']['id'], 'couldn\'t echo that')
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
