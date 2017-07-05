@@ -98,7 +98,7 @@ class FbBotView(generic.View):
                 pprint('No picture attached')
                 return False
 
-        elif phase == 4:
+        # elif phase == 4:
             # Tarkistetaan, että käyttäjä on jakanut sijainnin
             
         # elif phase == 6:
