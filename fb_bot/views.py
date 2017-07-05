@@ -95,6 +95,8 @@ class FbBotView(generic.View):
             message='temp',
             phase=0
         )
+
+        print(new_row.user_id)
         user = new_row.user_id
         prev_row = Feedback.objects.filter(user_id=user).latest('source_created_at')
         pprint(type(user))
