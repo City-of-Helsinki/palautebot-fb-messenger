@@ -133,6 +133,7 @@ class FbBotView(generic.View):
                         if feedback['phase'] == 9:
                             pprint('Bot message ignored!')
                         elif feedback['phase']== 0:
+                            pprint('THIS IS PHASE 0')
                             feedback['phase'] = feedback['phase']+1
                             feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
                             feedback_object = Feedback.objects.create(
@@ -142,6 +143,7 @@ class FbBotView(generic.View):
                                 phase= feedback['phase']
                             )
                         else:
+                            pprint('THIS IS PHASE 1-8')
                             feedback['phase'] = feedback['phase']+1
                             Feedback.objects.filter(id=row.id).delete()
                             feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
