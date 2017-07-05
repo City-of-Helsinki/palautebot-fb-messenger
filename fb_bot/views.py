@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from chatbot import settings
 from datetime import datetime
+from django.db.models import Q
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
