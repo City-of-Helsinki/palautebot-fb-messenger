@@ -95,15 +95,12 @@ class FbBotView(generic.View):
             message='temp',
             phase=0
         )
-
-        print(new_row.user_id)
         user = new_row.user_id
-        prev_row = Feedback.objects.filter(user_id=user).latest('source_created_at')
-        pprint(type(user))
+        default_date = new_row.source_created_at
+        prev_row = Feedback.objects.filter(user_id=user, source_created_at__gt=default_date).latest('source_created_at')
         pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id))
-        # if newest_record['phase'] !=
         Feedback.objects.filter(id=new_row.id).delete()
-        return 0
+        return prev_row.phase
 
 
     # Post function to handle Facebook messages
