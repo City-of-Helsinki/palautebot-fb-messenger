@@ -142,8 +142,8 @@ class FbBotView(generic.View):
                             )
                         else:
                             feedback['phase'] = feedback['phase']+1
-                            row = get_temp_row(message)
-                            Feedback.objects.filter(id=new_row.id).delete()
+                            row = self.get_temp_row(message)
+                            Feedback.objects.filter(id=row.id).delete()
                             feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
                             if feedback_object.phase == feedback['phase']:
                                 post_facebook_message(message['sender']['id'], feedback['title'])
