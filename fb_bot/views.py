@@ -131,7 +131,7 @@ class FbBotView(generic.View):
                         pprint('check_input == true')
                         if feedback['phase'] == 9:
                             pass
-                        else if feedback['phase']== 0:
+                        elif feedback['phase']== 0:
                             feedback['phase'] = feedback['phase']+1
                             feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
                             feedback_object = Feedback.objects.create(
