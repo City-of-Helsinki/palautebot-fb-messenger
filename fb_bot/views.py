@@ -47,6 +47,7 @@ class FbBotView(generic.View):
         return feedback
 
     def check_input(self, phase, user_input):
+        #user_input == message
         try:
             user_input = user_input['message']['text']
         except KeyError:
@@ -82,15 +83,30 @@ class FbBotView(generic.View):
                 return True
             return False
 
-        # elif phase == 2:
-        #     #Tarkistetaan, että Käyttäjä on lisännyt kuvan joko puhelimestaan tai suorana linkkinä.
-        # elif phase == 4:
-        #     # Tarkistetaan, että käyttäjä on jakanut sijainnin
+        elif phase == 2:
+            #Tarkistetaan, että Käyttäjä on lisännyt kuvan joko puhelimestaan tai suorana linkkinä.
+            for attachment in user_input['message']['attachments']:
+                if 'payload' in attachment:
+                    if 'url' in attachment['payload']:
+                        pprint('Picture found in the post')
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+            else:
+                pprint('No picture attached')
+                return False
+
+        elif phase == 4:
+            # Tarkistetaan, että käyttäjä on jakanut sijainnin
+            
         # elif phase == 6:
         #     # Tarkistetaan, että käyttäjä on kirjoittanut jonkin osoitteen
         elif phase == 9:
             return False
-        return True
+        return False
+
     def get_temp_row(self, message):
         new_row, created = Feedback.objects.get_or_create(
             user_id=message['sender']['id'],
