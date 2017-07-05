@@ -109,7 +109,7 @@ class FbBotView(generic.View):
             pprint('No matches in DB')
             return 0
         pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s\nmessage: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id, prev_row.message))
-        # Feedback.objects.filter(id=new_row.id).delete()
+        Feedback.objects.filter(id=new_row.id).delete()
         return prev_row.phase
 
 
