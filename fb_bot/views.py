@@ -100,7 +100,7 @@ class FbBotView(generic.View):
         user = new_row.user_id
         prev_row = Feedback.objects.filter(user_id=user).latest('source_created_at')
         pprint(type(user))
-        pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (r.id, r.phase, r.source_created_at, r.user_id))
+        pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id))
         # if newest_record['phase'] !=
         Feedback.objects.filter(id=new_row.id).delete()
         return 0
