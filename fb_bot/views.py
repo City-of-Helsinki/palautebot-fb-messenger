@@ -98,9 +98,11 @@ class FbBotView(generic.View):
         )
         user = new_row.user_id
         default_date = new_row.source_created_at
+        pprint(Feedback.objects.exclude(message='temp'))
+        pprint(Feedback.objects.exclude(message='temp').filter(user_id=user).latest('source_created_at').query)
         # exclude(message='temp').
         prev_row = Feedback.objects.filter(user_id=user).latest('source_created_at')
-        pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id))
+        pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s\nmessage: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id, prev_row.message))
         Feedback.objects.filter(id=new_row.id).delete()
         return prev_row.phase
 
@@ -112,7 +114,7 @@ class FbBotView(generic.View):
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
         # multiple messages in a single call during high load
-        pprint(incoming_message)
+        # pprint(incoming_message)
         for entry in incoming_message['entry']:
             for message in entry['messaging']:
                 # Check to make sure the received call is a message call
