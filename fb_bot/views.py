@@ -93,7 +93,7 @@ class FbBotView(generic.View):
         new_row, created = Feedback.objects.create(
             user_id=message['sender']['id'],
             message='temp',
-            phase='0'
+            phase=0
         )
         user = new_row.user_id
         prev_row = Feedback.objects.filter(user_id=user).latest('source_created_at')
