@@ -98,7 +98,7 @@ class FbBotView(generic.View):
         )
         user = new_row.user_id
         default_date = new_row.source_created_at
-        prev_row = Feedback.objects.filter(user_id=user,~Q(message='temp')).latest('source_created_at')
+        prev_row = Feedback.objects.filter(~Q(message='temp')).filter(user_id=user).latest('source_created_at')
         pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id))
         Feedback.objects.filter(id=new_row.id).delete()
         return prev_row.phase
