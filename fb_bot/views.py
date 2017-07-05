@@ -90,7 +90,7 @@ class FbBotView(generic.View):
         return True
 
     def get_phase(self, message):
-        new_row, created = Feedback.objects.create(
+        new_row = Feedback.objects.create(
             user_id=message['sender']['id'],
             message='temp',
             phase=0
