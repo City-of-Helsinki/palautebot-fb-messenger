@@ -145,10 +145,7 @@ class FbBotView(generic.View):
                             row = self.get_temp_row(message)
                             Feedback.objects.filter(id=row.id).delete()
                             feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
-                            if feedback_object.phase == feedback['phase']:
-                                post_facebook_message(message['sender']['id'], feedback['title'])
-                            else:
-                                pprint('Couldn\'t create new record, record already in db!')
+                            post_facebook_message(message['sender']['id'], feedback['title'])
                     else:
                         pprint('check_input == false')
                         post_facebook_message(message['sender']['id'], 'Check input didn\'t pass')
