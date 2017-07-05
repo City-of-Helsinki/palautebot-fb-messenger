@@ -92,7 +92,7 @@ class FbBotView(generic.View):
             return False
         return True
     def get_temp_row(self, message):
-        new_row = Feedback.objects.get_or_create(
+        new_row, created = Feedback.objects.get_or_create(
             user_id=message['sender']['id'],
             message='temp',
             phase=0
