@@ -88,6 +88,8 @@ class FbBotView(generic.View):
         #     # Tarkistetaan, että käyttäjä on jakanut sijainnin
         # elif phase == 6:
         #     # Tarkistetaan, että käyttäjä on kirjoittanut jonkin osoitteen
+        elif phase == 9:
+            return False
         return True
 
     def get_phase(self, message):
@@ -97,11 +99,15 @@ class FbBotView(generic.View):
             phase=0
         )
         user = new_row.user_id
+        if user == '204695756714834':
+            Feedback.objects.filter(id=new_row.id).delete()
+            return 9
         default_date = new_row.source_created_at
         prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
         pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s\nmessage: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id, prev_row.message))
         # Feedback.objects.filter(id=new_row.id).delete()
         return prev_row.phase
+
 
 
     # Post function to handle Facebook messages
@@ -116,23 +122,29 @@ class FbBotView(generic.View):
             for message in entry['messaging']:
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
-                if 'message' in message and 'sender' != '204695756714834':
+                if 'message' in message:
                     feedback['phase'] = self.get_phase(message)
                     if self.check_input(feedback['phase'], message):
                         pprint('check_input == true')
-                        feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
-                        feedback_object, created = Feedback.objects.update_or_create(
-                            source_created_at=feedback_start_at,
-                            user_id=message['sender']['id'],
-                            defaults={
-                                'message': message['message']['text'],
-                                'phase': feedback['phase']
-                            }
-                        )
-                        if created is True:
-                            post_facebook_message(message['sender']['id'], feedback['title'])
+                        if feedback['phase'] == 9:
+                            pass
+                        else:
+                            feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
+                            feedback_object, created = Feedback.objects.update_or_create(
+                                source_created_at=feedback_start_at,
+                                user_id=message['sender']['id'],
+                                message=message['message']['text'],
+                                defaults={
+                                    'phase': feedback['phase']
+                                }
+                            )
+                            if created is True:
+                                post_facebook_message(message['sender']['id'], feedback['title'])
+                            else:
+                                pprint('Couldn\'t create new record, record already in db!')
                     else:
                         pprint('check_input == false')
+                        post_facebook_message(message['sender']['id'], 'Check input didn\'t pass')
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly. 
 
