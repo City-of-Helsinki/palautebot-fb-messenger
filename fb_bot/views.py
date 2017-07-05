@@ -91,28 +91,27 @@ class FbBotView(generic.View):
         elif phase == 9:
             return False
         return True
-
-    def get_phase(self, message):
-        new_row = Feedback.objects.create(
+    def get_temp_row(self, message):
+        new_row = Feedback.objects.get_or_create(
             user_id=message['sender']['id'],
             message='temp',
             phase=0
         )
-        user = new_row.user_id
+        return new_row
+
+    def get_phase(self, message):
+        row = self.get_temp_row(message)
+        user = row.user_id
         if user == '204695756714834':
-            Feedback.objects.filter(id=new_row.id).delete()
-            return 9
-        default_date = new_row.source_created_at
+            Feedback.objects.filter(id=row.id).delete()
+            return row.phase
         try: 
             prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
         except Feedback.DoesNotExist:
             pprint('No matches in DB')
-            return 0
+            return row.phase
         pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s\nmessage: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id, prev_row.message))
-        Feedback.objects.filter(id=new_row.id).delete()
         return prev_row.phase
-
-
 
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
@@ -132,9 +131,10 @@ class FbBotView(generic.View):
                         pprint('check_input == true')
                         if feedback['phase'] == 9:
                             pass
-                        else:
+                        else if feedback['phase']== 0:
+                            feedback['phase'] = feedback['phase']+1
                             feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
-                            feedback_object, created = Feedback.objects.update_or_create(
+                            feedback_object = Feedback.objects.create(
                                 source_created_at=feedback_start_at,
                                 user_id=message['sender']['id'],
                                 message=message['message']['text'],
@@ -142,7 +142,12 @@ class FbBotView(generic.View):
                                     'phase': feedback['phase']
                                 }
                             )
-                            if created is True:
+                        else:
+                            feedback['phase'] = feedback['phase']+1
+                            row = get_temp_row(message)
+                            Feedback.objects.filter(id=new_row.id).delete()
+                            feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
+                            if feedback_object.phase == feedback['phase']:
                                 post_facebook_message(message['sender']['id'], feedback['title'])
                             else:
                                 pprint('Couldn\'t create new record, record already in db!')
