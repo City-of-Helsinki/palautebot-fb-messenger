@@ -138,9 +138,7 @@ class FbBotView(generic.View):
                                 source_created_at=feedback_start_at,
                                 user_id=message['sender']['id'],
                                 message=message['message']['text'],
-                                defaults={
-                                    'phase': feedback['phase']
-                                }
+                                phase= feedback['phase']
                             )
                         else:
                             feedback['phase'] = feedback['phase']+1
