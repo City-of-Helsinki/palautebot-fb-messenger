@@ -126,11 +126,12 @@ class FbBotView(generic.View):
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message:
+                    row = self.get_temp_row(message)
                     feedback['phase'] = self.get_phase(message)
                     if self.check_input(feedback['phase'], message):
                         pprint('check_input == true')
                         if feedback['phase'] == 9:
-                            pass
+                            pprint('Bot message ignored!')
                         elif feedback['phase']== 0:
                             feedback['phase'] = feedback['phase']+1
                             feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
@@ -142,14 +143,15 @@ class FbBotView(generic.View):
                             )
                         else:
                             feedback['phase'] = feedback['phase']+1
-                            row = self.get_temp_row(message)
                             Feedback.objects.filter(id=row.id).delete()
                             feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
                             post_facebook_message(message['sender']['id'], feedback['title'])
                     else:
                         pprint('check_input == false')
-                        pprint(message['sender']['id'])
-                        post_facebook_message(message['sender']['id'], 'Check input didn\'t pass')
+                        if row.id == '204695756714834':
+                            pprint('Bot cannot post to itself')
+                        else:
+                            post_facebook_message(message['sender']['id'], 'Check input didn\'t pass')
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
