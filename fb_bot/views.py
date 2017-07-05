@@ -103,7 +103,11 @@ class FbBotView(generic.View):
             Feedback.objects.filter(id=new_row.id).delete()
             return 9
         default_date = new_row.source_created_at
-        prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
+        try: 
+            prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
+        except Feedback.DoesNotExist:
+            pprint('No matches in DB')
+            return 0
         pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s\nmessage: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id, prev_row.message))
         # Feedback.objects.filter(id=new_row.id).delete()
         return prev_row.phase
