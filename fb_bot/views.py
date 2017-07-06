@@ -46,66 +46,89 @@ class FbBotView(generic.View):
         feedback['timestamp'] = ''
         return feedback
 
-    def check_input(self, phase, user_input):
-        #user_input == message
+    def is_yes(self, message):
+        message = message.lower()
+        message = message.strip(',.-!?:;')
+        accept_answers = ['kyllä', 'joo', 'juu', 'k']
+        if any(message in s for s in accept_answers):
+            return True
+        else:
+            return False
+
+    def is_no(self, message):
+        message = message.lower()
+        message = message.strip(',.-!?:;')
+        decline_answers = ['ei', 'e']
+        if any(message in s for s in decline_answers):
+            return True
+        else:
+            return False
+
+    def check_input(self, phase, message):
+        #Function checks if aquired message is valid
+        #Returns 0 (bad answer), 1 (Yes) or 2(No)
+
+        #check if message has been sent within 15minutes from the start of feedback
+
+        #check if message contains the supported information
         try:
-            user_input = user_input['message']['text']
+            user_input = message['message']['text']
         except KeyError:
             if phase == 2 or phase == 4:
                 try:
-                    user_input = user_input['message']['attachments']
+                    user_input = message['message']['attachments']
                 except KeyError:
-                    return False
+                    return 0
             else:
-                return False
+                return 0
 
-        bot_messages = ['Facebook messenger feedback']
+        #check if message is bot's own message
+        bot_messages = ['Facebook messenger feedback', 'Check input didn\'t pass']
         if any(user_input in s for s in bot_messages):
             pprint("check_input bot message detected and working")
-            return False
+            return 0
 
-        if phase == 0:
+        #PHASE 0: check if message is between 10 and 5000 marks
+        if phase == 0 or phase == 6:
             string_length = len(user_input)
             if (string_length > 10) and (string_length < 5000):
-                return True
-            return False
-
+                return 1
+            return 0
+        #PHASE 1,3,5: check if message contains 'yes', 'no' or invalid message
         elif phase == 1 or phase == 3 or phase == 5:
-            user_input = user_input.lower()
-            user_input = user_input.strip(',.-!?:;')
-            accept_answers = ['kyllä', 'joo', 'juu', 'k']
-            decline_answers = ['ei', 'e']
-            for user_input in accept_answers:
-                return True
-            for user_input in decline_answers:
-                # feedback['phase'] = phase+2
-                # save_to_database(feedback)
-                return True
-            return False
-
-        elif phase == 2:
-            #Tarkistetaan, että Käyttäjä on lisännyt kuvan joko puhelimestaan tai suorana linkkinä.
-            for attachment in user_input['message']['attachments']:
-                if 'payload' in attachment:
-                    if 'url' in attachment['payload']:
-                        pprint('Picture found in the post')
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
+            if self.is_yes(user_input):
+                return 1
+            elif self.is_no(user_input):
+                return 2
             else:
-                pprint('No picture attached')
-                return False
+                return 0
 
-        # elif phase == 4:
-            # Tarkistetaan, että käyttäjä on jakanut sijainnin
-            
-        # elif phase == 6:
-        #     # Tarkistetaan, että käyttäjä on kirjoittanut jonkin osoitteen
+        #PHASE 2: check if User has attached picture
+        elif phase == 2:
+            for attachment in user_input:
+                if 'url' in attachment['payload']:
+                    pprint('Picture found in the post')
+                    return 1
+                else:
+                    return 0
+            else:
+                return 0
+
+        #PHASE 4: check if user has attached location/map
+        elif phase == 4:
+            for attachment in user_input:
+                if 'lat' in attachment['payload']['coordinates'] and 'long' in attachment['payload']['coordinates']:
+                    pprint('Location found in the post')
+                    return 1
+                else:
+                    return 0
+            else:
+                return 0
+
+        #PHASE 9: Bot message doesn't need validating
         elif phase == 9:
-            return False
-        return False
+            return 0
+        return 0
 
     def get_temp_row(self, message):
         new_row, created = Feedback.objects.get_or_create(
@@ -120,14 +143,22 @@ class FbBotView(generic.View):
         user = row.user_id
         if user == '204695756714834':
             Feedback.objects.filter(id=row.id).delete()
-            return row.phase
+            return 9
         try: 
             prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
         except Feedback.DoesNotExist:
             pprint('No matches in DB')
             return row.phase
-        pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s\nmessage: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id, prev_row.message))
-        return prev_row.phase
+        if row.ready:
+            return row.phase
+        else:
+            # pprint('id: %s\nphase: %s\nsource_created_at: %s\nuser_id: %s\nmessage: %s' % (prev_row.id, prev_row.phase, prev_row.source_created_at, prev_row.user_id, prev_row.message))
+            return prev_row.phase
+
+    def save_to_hki_database(self, feedback):
+        #Send information to HKI database and return url to the feedback
+        return 'www.google.fi'
+
 
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
@@ -142,13 +173,12 @@ class FbBotView(generic.View):
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message:
+                    bot_answer = ''
                     row = self.get_temp_row(message)
                     feedback['phase'] = self.get_phase(message)
-                    if self.check_input(feedback['phase'], message):
+                    if self.check_input(feedback['phase'], message) == 1 or self.check_input(feedback['phase'], message) == 2:
                         pprint('check_input == true')
-                        if feedback['phase'] == 9:
-                            pprint('Bot message ignored!')
-                        elif feedback['phase']== 0:
+                        if feedback['phase']== 0:
                             pprint('THIS IS PHASE 0')
                             feedback['phase'] = feedback['phase']+1
                             feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
@@ -158,12 +188,75 @@ class FbBotView(generic.View):
                                 message=message['message']['text'],
                                 phase= feedback['phase']
                             )
-                        else:
-                            pprint('THIS IS PHASE 1-8')
-                            feedback['phase'] = feedback['phase']+1
-                            Feedback.objects.filter(id=row.id).delete()
+                            bot_answer = 'Haluatko lisätä kuvan palautteeseen(kyllä/ei)?'
+
+                        elif feedback['phase'] == 1:
+                            if self.is_yes(message['message']['text']):
+                                feedback['phase'] = feedback['phase']+1
+                                bot_answer = 'Liitä kuva'
+                            elif self.is_no(message['message']['text']):
+                                feedback['phase'] = feedback['phase']+2
+                                bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
                             feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
-                            post_facebook_message(message['sender']['id'], feedback['title'])
+
+                        elif feedback['phase'] == 2:
+                            for attachment in message['message']['attachments']:
+                                if 'url' in attachment['payload']:
+                                    feedback['url'] = attachment['payload']['url']
+                                    break
+                            feedback['phase'] = feedback['phase']+1
+                            feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'], media_url=feedback['media'])
+                            bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
+
+                        elif feedback['phase'] == 3:
+                            if self.is_yes(message['message']['text']):
+                                feedback['phase'] = feedback['phase']+1
+                                bot_answer = 'Liitä sijainti'
+                            elif self.is_no(message['message']['text']):
+                                feedback['phase'] = feedback['phase']+2
+                                bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
+                            feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
+
+                        elif feedback['phase'] == 4:
+                            for attachment in message['message']['attachments']:
+                                if 'lat' in attachment['payload']['coordinates']:
+                                    feedback['lat'] = attachment['payload']['coordinates']['lat']
+                                    feedback['long'] = attachment['payload']['coordinates']['long']
+                                    break
+                            feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'], lat_coordinate=feedback['lat'], long_coordinate=feedback['long'])
+                            bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
+
+                        elif feedback['phase'] == 5:
+                            if self.is_yes(message['message']['text']):
+                                feedback['phase'] = feedback['phase']+1
+                                bot_answer = 'Liitä sijainti'
+                            elif self.is_no(message['message']['text']):
+                                feedback['phase'] = feedback['phase']+2
+                                bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
+                                url = self.save_to_hki_database(feedback)
+                                if  url != '':
+                                    feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'], ready=True)
+                                else:
+                                    post_facebook_message(message['sender']['id'], 'Viestin tallentaminen hki tietokantaan epäonnistui')
+                            feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
+
+                        elif feedback['phase'] == 6:
+                            bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
+                            feedback['address'] = message['message']['text']
+                            url = self.save_to_hki_database(feedback)
+                            if  url != '':
+                                feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'], ready=True, street_address=feedback['address'])
+                            else:
+                                post_facebook_message(message['sender']['id'], 'Viestin tallentaminen hki tietokantaan epäonnistui')
+
+                        elif feedback['phase'] == 9:
+                            pprint('Bot message ignored!')
+                            continue
+                        else:
+                            pprint('THIS IS PHASE 7-8 THAT SHOULD NOT HAPPEN')
+                        post_facebook_message(message['sender']['id'], bot_answer)
+                        Feedback.objects.filter(id=row.id).delete()
+                        pprint(message)
                     else:
                         pprint('check_input == false')
                         if row.id == '204695756714834':
