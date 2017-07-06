@@ -35,6 +35,8 @@ class FbBotView(generic.View):
         return generic.View.dispatch(self, request, *args, **kwargs)
 
     def init_feedback(self):
+        #Function initializes feedback dictionary that holds user's feedback
+        #while the script is running
         feedback = {}
         feedback['title'] = 'Facebook messenger feedback'
         feedback['address'] = ''
@@ -47,6 +49,7 @@ class FbBotView(generic.View):
         return feedback
 
     def is_yes(self, message):
+        #Function checks if given message matches acceptable accept_answers
         message = message.lower()
         message = message.strip(',.-!?:;')
         accept_answers = ['kyllä', 'joo', 'juu', 'k']
@@ -56,6 +59,7 @@ class FbBotView(generic.View):
             return False
 
     def is_no(self, message):
+        #Function checks if given message matches acceptable decline_answers
         message = message.lower()
         message = message.strip(',.-!?:;')
         decline_answers = ['ei', 'e']
@@ -176,6 +180,8 @@ class FbBotView(generic.View):
                     bot_answer = ''
                     row = self.get_temp_row(message)
                     feedback['phase'] = self.get_phase(message)
+                    pprint('BEFORE CHECK_INPUT PHASE: %s' %(feedback['phase']))
+                    pprint(message)
                     if self.check_input(feedback['phase'], message) == 1 or self.check_input(feedback['phase'], message) == 2:
                         pprint('check_input == true')
                         if feedback['phase']== 0:
@@ -191,6 +197,7 @@ class FbBotView(generic.View):
                             bot_answer = 'Haluatko lisätä kuvan palautteeseen(kyllä/ei)?'
 
                         elif feedback['phase'] == 1:
+                            pprint('THIS IS PHASE 1')
                             if self.is_yes(message['message']['text']):
                                 feedback['phase'] = feedback['phase']+1
                                 bot_answer = 'Liitä kuva'
@@ -200,6 +207,7 @@ class FbBotView(generic.View):
                             feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
 
                         elif feedback['phase'] == 2:
+                            pprint('THIS IS PHASE 2')
                             for attachment in message['message']['attachments']:
                                 if 'url' in attachment['payload']:
                                     feedback['url'] = attachment['payload']['url']
@@ -209,6 +217,7 @@ class FbBotView(generic.View):
                             bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
 
                         elif feedback['phase'] == 3:
+                            pprint('THIS IS PHASE 3')
                             if self.is_yes(message['message']['text']):
                                 feedback['phase'] = feedback['phase']+1
                                 bot_answer = 'Liitä sijainti'
@@ -218,6 +227,7 @@ class FbBotView(generic.View):
                             feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
 
                         elif feedback['phase'] == 4:
+                            pprint('THIS IS PHASE 4')
                             for attachment in message['message']['attachments']:
                                 if 'lat' in attachment['payload']['coordinates']:
                                     feedback['lat'] = attachment['payload']['coordinates']['lat']
@@ -227,6 +237,7 @@ class FbBotView(generic.View):
                             bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
 
                         elif feedback['phase'] == 5:
+                            pprint('THIS IS PHASE 5')
                             if self.is_yes(message['message']['text']):
                                 feedback['phase'] = feedback['phase']+1
                                 bot_answer = 'Liitä sijainti'
@@ -241,6 +252,7 @@ class FbBotView(generic.View):
                             feedback_object = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
 
                         elif feedback['phase'] == 6:
+                            pprint('THIS IS PHASE 6')
                             bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
                             feedback['address'] = message['message']['text']
                             url = self.save_to_hki_database(feedback)
@@ -250,6 +262,7 @@ class FbBotView(generic.View):
                                 post_facebook_message(message['sender']['id'], 'Viestin tallentaminen hki tietokantaan epäonnistui')
 
                         elif feedback['phase'] == 9:
+                            pprint('THIS IS PHASE 9')
                             pprint('Bot message ignored!')
                             continue
                         else:
