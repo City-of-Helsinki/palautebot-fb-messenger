@@ -166,8 +166,12 @@ class FbBotView(generic.View):
             return ''
         if prev_row.ready:
             return ''
-        # if prev_row.source_created_at - now() > 15minutes:
-        #     return ''
+        #TODO: SESSION AIKAKATKAISU
+        print(datetime.now())
+        print(prev_row.source_created_at)
+        print(prev_row.source_created_at - datetime.now())
+        if (prev_row.source_created_at - datetime.now()) > 15minutes:
+            return ''
         return prev_row
 
     def get_phase(self, message):
