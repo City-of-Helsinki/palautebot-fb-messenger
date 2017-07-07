@@ -99,12 +99,6 @@ class FbBotView(generic.View):
 
         #PHASE 0 & PHASE 6: check if message is between 10 and 5000 marks
         if phase == 0 or phase == 6:
-            if phase == 0:
-                message = self.get_feedback_to_update(user)
-                if message == '':
-                    pass
-                elif message.ready:
-                    return 0
             string_length = len(user_input)
             if (string_length > 10) and (string_length < 5000):
                 return 1
@@ -170,6 +164,10 @@ class FbBotView(generic.View):
             prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
         except Feedback.DoesNotExist:
             return ''
+        if prev_row.ready:
+            return ''
+        # if prev_row.source_created_at - now() > 15minutes:
+        #     return ''
         return prev_row
 
     def get_phase(self, message):
