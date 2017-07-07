@@ -88,7 +88,7 @@ class FbBotView(generic.View):
             if any(user_input in s for s in bot_messages):
                 pprint("check_input bot message detected and working")
                 return 0
-        except KeyError, TypeError as e:
+        except (KeyError, TypeError) as e:
             if phase == 2 or phase == 4:
                 try:
                     user_input = message['message']['attachments']
