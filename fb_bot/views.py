@@ -74,10 +74,21 @@ class FbBotView(generic.View):
 
         #check if message has been sent within 15minutes from the start of feedback
 
-        #check if message contains the supported information
+        bot_messages = ['Facebook messenger feedback', 
+                        'Check input didn\'t pass',
+                        'Haluatko lisätä kuvan palautteeseen(kyllä/ei)?',
+                        'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?',
+                        'Liitä kuva',
+                        'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?',
+                        'Liitä sijainti',
+                        'Kirjoita osoite tai lisätiedot paikasta']
+        #check if message contains the supported information OR bot's own message
         try:
             user_input = message['message']['text']
-        except KeyError:
+            if any(user_input in s for s in bot_messages):
+                pprint("check_input bot message detected and working")
+                return 0
+        except KeyError, TypeError as e:
             if phase == 2 or phase == 4:
                 try:
                     user_input = message['message']['attachments']
@@ -85,12 +96,6 @@ class FbBotView(generic.View):
                     return 0
             else:
                 return 0
-
-        #check if message is bot's own message
-        bot_messages = ['Facebook messenger feedback', 'Check input didn\'t pass']
-        if any(user_input in s for s in bot_messages):
-            pprint("check_input bot message detected and working")
-            return 0
 
         #PHASE 0: check if message is between 10 and 5000 marks
         if phase == 0 or phase == 6:
@@ -252,7 +257,7 @@ class FbBotView(generic.View):
                             pprint('THIS IS PHASE 5')
                             if user_input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
-                                bot_answer = 'Liitä sijainti'
+                                bot_answer = 'Kirjoita osoite tai lisätiedot paikasta'
                             elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                                 bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
