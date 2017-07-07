@@ -240,7 +240,7 @@ class FbBotView(generic.View):
                                     feedback['url'] = attachment['payload']['url']
                                     break
                             feedback['phase'] = feedback['phase']+1
-                            query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'], media_url=feedback['media'])
+                            query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'], media_url=row.media_url)
                             bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
 
                         elif feedback['phase'] == 3:
@@ -259,6 +259,7 @@ class FbBotView(generic.View):
                                 if 'lat' in attachment['payload']['coordinates']:
                                     feedback['lat'] = attachment['payload']['coordinates']['lat']
                                     feedback['long'] = attachment['payload']['coordinates']['long']
+                                    feedback['phase'] = feedback['phase']+1
                                     break
                             query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'], lat_coordinate=feedback['lat'], long_coordinate=feedback['long'])
                             bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
