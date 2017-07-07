@@ -157,7 +157,7 @@ class FbBotView(generic.View):
         if user == '204695756714834':
             Feedback.objects.filter(id=row.id).delete()
             return 9
-            prev_row = self.get_feedback_to_update(user)
+        prev_row = self.get_feedback_to_update(user)
         if prev_row == '':
             pprint('No matches in DB')
             return row.phase
