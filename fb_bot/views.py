@@ -211,7 +211,7 @@ class FbBotView(generic.View):
                     feedback['phase'] = self.get_phase(message)
                     pprint('BEFORE CHECK_INPUT PHASE: %s' %(feedback['phase']))
                     pprint(message)
-                    user_input_valid = self.check_input(feedback['phase'], message, user)
+                    user_input_valid = self.check_input(feedback['phase'], message, row.user_id)
                     if user_input_valid == 1 or user_input_valid == 2:
                         pprint('check_input == true')
                         row = self.get_temp_row(message)
