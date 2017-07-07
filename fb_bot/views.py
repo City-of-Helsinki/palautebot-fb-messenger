@@ -68,7 +68,7 @@ class FbBotView(generic.View):
         else:
             return False
 
-    def check_input(self, phase, message):
+    def check_input(self, phase, message, user):
         #Function checks if aquired message is valid
         #Returns 0 (bad answer), 1 (Yes) or 2(No)
 
@@ -97,12 +97,17 @@ class FbBotView(generic.View):
             else:
                 return 0
 
-        #PHASE 0: check if message is between 10 and 5000 marks
+        #PHASE 0 & PHASE 6: check if message is between 10 and 5000 marks
         if phase == 0 or phase == 6:
+            if phase == 0:
+                message = self.get_feedback_to_update(user)
+                if message.ready:
+                    return 0
             string_length = len(user_input)
             if (string_length > 10) and (string_length < 5000):
                 return 1
             return 0
+
         #PHASE 1,3,5: check if message contains 'yes', 'no' or invalid message
         elif phase == 1 or phase == 3 or phase == 5:
             if self.is_yes(user_input):
@@ -133,6 +138,7 @@ class FbBotView(generic.View):
                     return 0
             else:
                 return 0
+
 
         #PHASE 9: Bot message doesn't need validating
         elif phase == 9:
@@ -205,7 +211,7 @@ class FbBotView(generic.View):
                     feedback['phase'] = self.get_phase(message)
                     pprint('BEFORE CHECK_INPUT PHASE: %s' %(feedback['phase']))
                     pprint(message)
-                    user_input_valid = self.check_input(feedback['phase'], message)
+                    user_input_valid = self.check_input(feedback['phase'], message, user)
                     if user_input_valid == 1 or user_input_valid == 2:
                         pprint('check_input == true')
                         row = self.get_temp_row(message)
@@ -285,6 +291,7 @@ class FbBotView(generic.View):
                             url = self.save_to_hki_database(feedback)
                             bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
                             if  url != '':
+                                feedback['phase'] = 0
                                 query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'], ready=True, street_address=feedback['address'])
                             else:
                                 post_facebook_message(message['sender']['id'], 'Viestin tallentaminen hki tietokantaan epäonnistui')
