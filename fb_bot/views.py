@@ -142,15 +142,23 @@ class FbBotView(generic.View):
         )
         return new_row
 
+    def get_feedback_to_update(self, user):
+        try: 
+            prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
+        except Feedback.DoesNotExist:
+            return ''
+        return prev_row
+
     def get_phase(self, message):
+        # Function returns phase of the feedback from database.
+        # row.phase value is always 0
         row = self.get_temp_row(message)
         user = row.user_id
         if user == '204695756714834':
             Feedback.objects.filter(id=row.id).delete()
             return 9
-        try: 
-            prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
-        except Feedback.DoesNotExist:
+            prev_row = self.get_feedback_to_update(user)
+        if prev_row == '':
             pprint('No matches in DB')
             return row.phase
         if row.ready:
@@ -184,6 +192,9 @@ class FbBotView(generic.View):
                     pprint(message)
                     if self.check_input(feedback['phase'], message) == 1 or self.check_input(feedback['phase'], message) == 2:
                         pprint('check_input == true')
+                        row = self.get_temp_row(message)
+                        user = row.user_id
+                        prev_row = self.get_feedback_to_update(user)
                         if feedback['phase']== 0:
                             pprint('THIS IS PHASE 0')
                             feedback['phase'] = feedback['phase']+1
@@ -204,7 +215,7 @@ class FbBotView(generic.View):
                             elif self.is_no(message['message']['text']):
                                 feedback['phase'] = feedback['phase']+2
                                 bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
-                            query_response = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
+                            query_response = Feedback.objects.filter(id=prev.row.id).update(phase=feedback['phase'])
 
                         elif feedback['phase'] == 2:
                             pprint('THIS IS PHASE 2')
@@ -213,7 +224,7 @@ class FbBotView(generic.View):
                                     feedback['url'] = attachment['payload']['url']
                                     break
                             feedback['phase'] = feedback['phase']+1
-                            query_response = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'], media_url=feedback['media'])
+                            query_response = Feedback.objects.filter(id=prev.row.id).update(phase=feedback['phase'], media_url=feedback['media'])
                             bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
 
                         elif feedback['phase'] == 3:
@@ -224,7 +235,7 @@ class FbBotView(generic.View):
                             elif self.is_no(message['message']['text']):
                                 feedback['phase'] = feedback['phase']+2
                                 bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
-                            query_response = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
+                            query_response = Feedback.objects.filter(id=prev.row.id).update(phase=feedback['phase'])
 
                         elif feedback['phase'] == 4:
                             pprint('THIS IS PHASE 4')
@@ -233,7 +244,7 @@ class FbBotView(generic.View):
                                     feedback['lat'] = attachment['payload']['coordinates']['lat']
                                     feedback['long'] = attachment['payload']['coordinates']['long']
                                     break
-                            query_response = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'], lat_coordinate=feedback['lat'], long_coordinate=feedback['long'])
+                            query_response = Feedback.objects.filter(id=prev.row.id).update(phase=feedback['phase'], lat_coordinate=feedback['lat'], long_coordinate=feedback['long'])
                             bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
 
                         elif feedback['phase'] == 5:
@@ -246,10 +257,10 @@ class FbBotView(generic.View):
                                 bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
                                 url = self.save_to_hki_database(feedback)
                                 if  url != '':
-                                    query_response = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'], ready=True)
+                                    query_response = Feedback.objects.filter(id=prev.row.id).update(phase=feedback['phase'], ready=True)
                                 else:
                                     post_facebook_message(message['sender']['id'], 'Viestin tallentaminen hki tietokantaan epäonnistui')
-                            query_response = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'])
+                            query_response = Feedback.objects.filter(id=prev.row.id).update(phase=feedback['phase'])
 
                         elif feedback['phase'] == 6:
                             pprint('THIS IS PHASE 6')
@@ -257,7 +268,7 @@ class FbBotView(generic.View):
                             feedback['address'] = message['message']['text']
                             url = self.save_to_hki_database(feedback)
                             if  url != '':
-                                query_response = Feedback.objects.filter(id=row.id).update(phase=feedback['phase'], ready=True, street_address=feedback['address'])
+                                query_response = Feedback.objects.filter(id=prev.row.id).update(phase=feedback['phase'], ready=True, street_address=feedback['address'])
                             else:
                                 post_facebook_message(message['sender']['id'], 'Viestin tallentaminen hki tietokantaan epäonnistui')
 
