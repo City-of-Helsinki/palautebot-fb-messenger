@@ -140,11 +140,27 @@ class FbBotView(generic.View):
         return 0
 
     def get_temp_row(self, message):
-        new_row, created = Feedback.objects.get_or_create(
-            user_id=message['sender']['id'],
-            message='temp',
-            phase=0
-        )
+        for attachment in message['message']['attachments']:
+            try:
+                url = attachment['payload']['url']
+                new_row, created = Feedback.objects.get_or_create(
+                    user_id=message['sender']['id'],
+                    message='temp',
+                    phase=0,
+                    media_url=url
+                )
+            except KeyError:
+                new_row, created = Feedback.objects.get_or_create(
+                    user_id=message['sender']['id'],
+                    message='temp',
+                    phase=0,
+                )
+        else:
+            new_row, created = Feedback.objects.get_or_create(
+                user_id=message['sender']['id'],
+                message='temp',
+                phase=0,
+            )
         return new_row
 
     def get_feedback_to_update(self, user):
