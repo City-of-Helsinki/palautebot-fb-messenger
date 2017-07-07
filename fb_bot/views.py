@@ -5,6 +5,7 @@ from datetime import datetime
 from django.db.models import Q
 from django.http.response import HttpResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -169,8 +170,8 @@ class FbBotView(generic.View):
         #TODO: SESSION AIKAKATKAISU
         print(datetime.now())
         print(prev_row.source_created_at)
-        print(prev_row.source_created_at - datetime.now())
-        if (prev_row.source_created_at - datetime.now()) > 900:
+        print(prev_row.source_created_at - timezone.make_aware(datetime.now(), timezone=settings.TIMEZONE))
+        if (prev_row.source_created_at - timezone.make_naive(datetime.now(), timezone=settings.TIMEZONE)) > 900:
             return ''
         return prev_row
 
@@ -224,7 +225,7 @@ class FbBotView(generic.View):
                         if feedback['phase']== 0:
                             pprint('THIS IS PHASE 0')
                             feedback['phase'] = feedback['phase']+1
-                            feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
+                            feedback_start_at = timezone.make_aware(datetime.fromtimestamp(message['timestamp']/1000), timezone=settings.TIMEZONE)
                             query_response = Feedback.objects.create(
                                 source_created_at=feedback_start_at,
                                 user_id=message['sender']['id'],
