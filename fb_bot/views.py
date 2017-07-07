@@ -271,8 +271,8 @@ class FbBotView(generic.View):
                                 bot_answer = 'Kirjoita osoite tai lisätiedot paikasta'
                             elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
-                                bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
                                 url = self.save_to_hki_database(feedback)
+                                bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
                                 if  url != '':
                                     query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'], ready=True)
                                 else:
@@ -281,9 +281,9 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 6:
                             pprint('THIS IS PHASE 6')
-                            bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
                             feedback['address'] = message['message']['text']
                             url = self.save_to_hki_database(feedback)
+                            bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
                             if  url != '':
                                 query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'], ready=True, street_address=feedback['address'])
                             else:
