@@ -190,7 +190,8 @@ class FbBotView(generic.View):
                     feedback['phase'] = self.get_phase(message)
                     pprint('BEFORE CHECK_INPUT PHASE: %s' %(feedback['phase']))
                     pprint(message)
-                    if self.check_input(feedback['phase'], message) == 1 or self.check_input(feedback['phase'], message) == 2:
+                    user_input_valid = self.check_input(feedback['phase'], message)
+                    if user_input_valid == 1 or user_input_valid == 2:
                         pprint('check_input == true')
                         row = self.get_temp_row(message)
                         user = row.user_id
@@ -209,10 +210,10 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 1:
                             pprint('THIS IS PHASE 1')
-                            if self.is_yes(message['message']['text']):
+                            if user_input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
                                 bot_answer = 'Liitä kuva'
-                            elif self.is_no(message['message']['text']):
+                            elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                                 bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
                             query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'])
@@ -229,10 +230,10 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 3:
                             pprint('THIS IS PHASE 3')
-                            if self.is_yes(message['message']['text']):
+                            if user_input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
                                 bot_answer = 'Liitä sijainti'
-                            elif self.is_no(message['message']['text']):
+                            elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                                 bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
                             query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'])
@@ -249,10 +250,10 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 5:
                             pprint('THIS IS PHASE 5')
-                            if self.is_yes(message['message']['text']):
+                            if user_input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
                                 bot_answer = 'Liitä sijainti'
-                            elif self.is_no(message['message']['text']):
+                            elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                                 bot_answer = 'Kiitos palautteestasi! Voit seurata palautteen käsittelyä oheisesta linkistä %s\n\n Voit antaa uuden palautteen kirjoittamalla sen lyhyesti tähän keskusteluun (10-5000 merkkiä)' % (url)
                                 url = self.save_to_hki_database(feedback)
