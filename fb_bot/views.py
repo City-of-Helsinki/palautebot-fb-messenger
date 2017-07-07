@@ -101,7 +101,9 @@ class FbBotView(generic.View):
         if phase == 0 or phase == 6:
             if phase == 0:
                 message = self.get_feedback_to_update(user)
-                if message.ready:
+                if message == '':
+                    pass
+                elif message.ready:
                     return 0
             string_length = len(user_input)
             if (string_length > 10) and (string_length < 5000):
