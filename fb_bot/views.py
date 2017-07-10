@@ -227,7 +227,8 @@ class FbBotView(generic.View):
                         if feedback['phase']== 0:
                             pprint('THIS IS PHASE 0')
                             feedback['phase'] = feedback['phase']+1
-                            feedback_start_at = timezone.make_aware(datetime.fromtimestamp(message['timestamp']/1000), timezone=settings.TIMEZONE)
+                            tz = pytz.timezone(settings.TIMEZONE)
+                            feedback_start_at = timezone.make_aware(datetime.fromtimestamp(message['timestamp']/1000), timezone=tz)
                             query_response = Feedback.objects.create(
                                 source_created_at=feedback_start_at,
                                 user_id=message['sender']['id'],
