@@ -302,6 +302,7 @@ class FbBotView(generic.View):
                             pprint('THIS IS PHASE 5')
                             if user_input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
+                                bot_answer = bot_answers[feedback['phase']]
                             elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                                 url = self.save_to_hki_database(feedback)
