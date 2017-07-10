@@ -174,7 +174,7 @@ class FbBotView(generic.View):
         print('NOW SECONDS ', datetime.now(settings.TIMEZONE).seconds)
         print('DB  SECONDS ', prev_row.source_created_at.astimezone(settings.TIMEZONE).seconds)
 
-        time_since_fb_started = prev_row.source_created_at.astimezone(settings.TIMEZONE) - datetime.now(settings.TIMEZONE)
+        time_since_fb_started = datetime.now(settings.TIMEZONE) - prev_row.source_created_at.astimezone(settings.TIMEZONE)
 
         print('TIME', time_since_fb_started)
         print('SECONDS', time_since_fb_started.seconds)
