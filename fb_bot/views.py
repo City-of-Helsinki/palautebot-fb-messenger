@@ -336,8 +336,11 @@ class FbBotView(generic.View):
                         if row.id == '204695756714834':
                             pprint('Bot cannot post to itself')
                         else:
-                            bot_answer = 'Virheellinen syöte. %s' % (bot_answers[feedback['phase']])
-                            post_facebook_message(message['sender']['id'], bot_answer)
+                            if feedback['phase'] == 9:
+                                pass
+                            else:
+                                bot_answer = 'Virheellinen syöte. %s' % (bot_answers[feedback['phase']])
+                                post_facebook_message(message['sender']['id'], bot_answer)
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
