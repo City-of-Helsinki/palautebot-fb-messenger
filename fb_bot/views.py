@@ -166,7 +166,7 @@ class FbBotView(generic.View):
         if prev_row.ready:
             return ''
         #TODO: SESSION AIKAKATKAISU
-        print(datetime.now())
+        print('######', datetime.now())
         print(prev_row.source_created_at)
 
         print(datetime.now())
