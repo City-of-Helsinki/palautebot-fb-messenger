@@ -114,17 +114,24 @@ class FbBotView(generic.View):
 
         #PHASE 2: check if User has attached picture
         elif phase == 2:
+            media_count = 0
             for attachment in user_input:
                 try:
-                    if 'url' in attachment['payload']:
-                        pprint('Picture found in the post')
-                        return 1
+                    if attachment['type'] == 'image' or attachment['type'] == 'video':
+                        if 'url' in attachment['payload']:
+                            media_count = media_count+1
+                            pprint('IMAGE %s FOUND' %(media_count))
+                        else:
+                            pass
                     else:
+                        pprint('RECORD FOUND')
                         return 0
                 except TypeError:
                     return 0
             else:
                 return 0
+            if media_count != 0:
+                return 1
 
         #PHASE 4: check if user has attached location/map
         elif phase == 4:
@@ -217,7 +224,6 @@ class FbBotView(generic.View):
     def post(self, request, *args, **kwargs):
         feedback = self.init_feedback()
         bot_answers = self.init_answers()
-
         # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
@@ -250,16 +256,15 @@ class FbBotView(generic.View):
                                 message=message['message']['text'],
                                 phase= feedback['phase']
                             )
-                            bot_answer = 'Haluatko lisätä kuvan palautteeseen (kyllä/ei)?'
+                            bot_answer = bot_answers[feedback['phase']]
 
                         elif feedback['phase'] == 1:
                             pprint('THIS IS PHASE 1')
                             if user_input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
-                                bot_answer = 'Liitä kuva'
                             elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
-                                bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
+                            bot_answer = bot_answers[feedback['phase']]
                             query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'])
 
                         elif feedback['phase'] == 2:
@@ -270,16 +275,15 @@ class FbBotView(generic.View):
                                     break
                             feedback['phase'] = feedback['phase']+1
                             query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'], media_url=row.media_url)
-                            bot_answer = 'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?'
+                            bot_answer = bot_answers[feedback['phase']]
 
                         elif feedback['phase'] == 3:
                             pprint('THIS IS PHASE 3')
                             if user_input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
-                                bot_answer = 'Liitä sijainti'
                             elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
-                                bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
+                            bot_answer = bot_answers[feedback['phase']]
                             query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'])
 
                         elif feedback['phase'] == 4:
@@ -291,13 +295,12 @@ class FbBotView(generic.View):
                                     feedback['phase'] = feedback['phase']+1
                                     break
                             query_response = Feedback.objects.filter(id=prev_row.id).update(phase=feedback['phase'], lat_coordinate=feedback['lat'], long_coordinate=feedback['long'])
-                            bot_answer = 'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?'
+                            bot_answer = bot_answers[feedback['phase']]
 
                         elif feedback['phase'] == 5:
                             pprint('THIS IS PHASE 5')
                             if user_input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
-                                bot_answer = 'Kirjoita osoite tai lisätiedot paikasta'
                             elif user_input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                                 url = self.save_to_hki_database(feedback)
