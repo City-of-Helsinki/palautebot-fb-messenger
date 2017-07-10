@@ -167,10 +167,12 @@ class FbBotView(generic.View):
             return ''
         #TODO: SESSION AIKAKATKAISU
         print('NOW ', datetime.now())
-        print('TIME FROM DB',prev_row.source_created_at)
-        print('TIME FROM DB MADE AWARE', prev_row.source_created_at.astimezone(settings.TIMEZONE))
+        print('TIME FROM DB ',prev_row.source_created_at)
+        print('TIME FROM DB MADE AWARE ', prev_row.source_created_at.astimezone(settings.TIMEZONE))
+        print('NOW MADE AWARE ', datetime.now(settings.TIMEZONE))
 
-        print('NOW MADE AWARE', datetime.now(settings.TIMEZONE))
+        print('NOW SECONDS ', datetime.now(settings.TIMEZONE).seconds)
+        print('DB  SECONDS ', prev_row.source_created_at.astimezone(settings.TIMEZONE).seconds)
 
         time_since_fb_started = prev_row.source_created_at.astimezone(settings.TIMEZONE) - datetime.now(settings.TIMEZONE)
 
