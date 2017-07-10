@@ -115,10 +115,13 @@ class FbBotView(generic.View):
         #PHASE 2: check if User has attached picture
         elif phase == 2:
             for attachment in user_input:
-                if 'url' in attachment['payload']:
-                    pprint('Picture found in the post')
-                    return 1
-                else:
+                try:
+                    if 'url' in attachment['payload']:
+                        pprint('Picture found in the post')
+                        return 1
+                    else:
+                        return 0
+                except TypeError:
                     return 0
             else:
                 return 0
@@ -126,10 +129,13 @@ class FbBotView(generic.View):
         #PHASE 4: check if user has attached location/map
         elif phase == 4:
             for attachment in user_input:
-                if 'lat' in attachment['payload']['coordinates'] and 'long' in attachment['payload']['coordinates']:
-                    pprint('Location found in the post')
-                    return 1
-                else:
+                try:
+                    if 'lat' in attachment['payload']['coordinates'] and 'long' in attachment['payload']['coordinates']:
+                        pprint('Location found in the post')
+                        return 1
+                    else:
+                        return 0
+                except TypeError:
                     return 0
             else:
                 return 0
