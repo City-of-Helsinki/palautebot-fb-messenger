@@ -174,7 +174,7 @@ class FbBotView(generic.View):
         time_since_fb_started = prev_row.source_created_at - datetime.now(settings.TIMEZONE)
 
         print('TIME', time_since_fb_started)
-        print('MINUTES', time_since_fb_started.minutes)
+        print('SECONDS', time_since_fb_started.seconds)
 
         if time_since_fb_started.seconds > 900:
             Feedback.objects.filter(id=prev_row.id).delete()
