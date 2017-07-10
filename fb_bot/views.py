@@ -173,6 +173,7 @@ class FbBotView(generic.View):
         tz = pytz.timezone(settings.TIMEZONE)
         time_since_fb_started = prev_row.source_created_at - timezone.make_aware(datetime.now(), timezone=tz)
         if time_since_fb_started.seconds > 900:
+            Feedback.objects.filter(id=prev_row.id).delete()
             return ''
         return prev_row
 
