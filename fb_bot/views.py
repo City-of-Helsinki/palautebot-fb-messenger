@@ -207,12 +207,12 @@ class FbBotView(generic.View):
         return 'www.google.fi'
 
     def init_answers(self):
-        bot_answers = ['Virheellinen syöte. Kirjoita lyhyesti palautteesi (10-5000 merkkiä)',
-                       'Virheellinen syöte. Haluatko lisätä kuvan palautteeseen (kyllä/ei)?',
-                       'Virheellinen syöte. Liitä kuva',
-                       'Virheellinen syöte. Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?',
-                       'Virheellinen syöte. Liitä sijainti',
-                       'Virheellinen syöte. Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?',
+        bot_answers = ['Kirjoita lyhyesti palautteesi (10-5000 merkkiä)',
+                       'Haluatko lisätä kuvan palautteeseen (kyllä/ei)?',
+                       'Liitä kuva',
+                       'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?',
+                       'Liitä sijainti',
+                       'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?',
                        'Kirjoita osoite tai lisätiedot paikasta',]
         return bot_answers
 
