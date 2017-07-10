@@ -135,7 +135,7 @@ class FbBotView(generic.View):
                         return 1
                     else:
                         return 0
-                except TypeError:
+                except (TypeError, KeyError) as e:
                     return 0
             else:
                 return 0
@@ -174,20 +174,7 @@ class FbBotView(generic.View):
             return ''
         if prev_row.ready:
             return ''
-        #TODO: SESSION AIKAKATKAISU
-        print('NOW ', datetime.now())
-        print('TIME FROM DB ',prev_row.source_created_at)
-        print('TIME FROM DB MADE AWARE ', prev_row.source_created_at.astimezone(settings.TIMEZONE))
-        print('NOW MADE AWARE ', datetime.now(settings.TIMEZONE))
-
-        # print('NOW SECONDS ', datetime.now(settings.TIMEZONE).seconds)
-        # print('DB  SECONDS ', prev_row.source_created_at.astimezone(settings.TIMEZONE).seconds)
-
         time_since_fb_started = datetime.now(settings.TIMEZONE) - prev_row.source_created_at.astimezone(settings.TIMEZONE)
-
-        print('TIME', time_since_fb_started)
-        print('SECONDS', time_since_fb_started.seconds)
-
         if time_since_fb_started.seconds > 900:
             Feedback.objects.filter(id=prev_row.id).delete()
             return ''
