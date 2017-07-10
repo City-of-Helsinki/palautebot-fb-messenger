@@ -170,8 +170,9 @@ class FbBotView(generic.View):
         #TODO: SESSION AIKAKATKAISU
         print(datetime.now())
         print(prev_row.source_created_at)
-        print(prev_row.source_created_at - timezone.make_aware(datetime.now(), timezone=settings.TIMEZONE))
-        if (prev_row.source_created_at - timezone.make_naive(datetime.now(), timezone=settings.TIMEZONE)) > 900:
+        tz = pytz.timezone(settings.TIMEZONE)
+        print(prev_row.source_created_at - timezone.make_aware(datetime.now(), timezone=tz))
+        if (prev_row.source_created_at - timezone.make_naive(datetime.now(), timezone=tz)) > 900:
             return ''
         return prev_row
 
