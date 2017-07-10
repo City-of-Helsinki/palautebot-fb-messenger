@@ -150,19 +150,19 @@ class FbBotView(generic.View):
         try:
             for attachment in message['message']['attachments']:
                 url = attachment['payload']['url']
-                new_row, created = Feedback.objects.get_or_create(
+                temp_row, created = Feedback.objects.get_or_create(
                     user_id=message['sender']['id'],
                     message='temp',
                     phase=0,
-                    media_url=url
                 )
         except KeyError:
-            new_row, created = Feedback.objects.get_or_create(
+            temp_row, created = Feedback.objects.get_or_create(
                 user_id=message['sender']['id'],
                 message='temp',
                 phase=0,
             )
-        return new_row
+        temp_row = Feedback.objects.filter(id=temp_row.id).update(media_url=url)
+        return temp_row
 
     def get_feedback_to_update(self, user):
         try: 
@@ -227,6 +227,7 @@ class FbBotView(generic.View):
     def post(self, request, *args, **kwargs):
         feedback = self.init_feedback()
         bot_answers = self.init_answers()
+
         # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
