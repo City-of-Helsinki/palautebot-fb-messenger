@@ -171,8 +171,8 @@ class FbBotView(generic.View):
         print(datetime.now())
         print(prev_row.source_created_at)
         tz = pytz.timezone(settings.TIMEZONE)
-        print(prev_row.source_created_at - timezone.make_aware(datetime.now(), timezone=tz))
-        if (prev_row.source_created_at - timezone.make_aware(datetime.now(), timezone=tz)) > 900:
+        time_since_fb_started = prev_row.source_created_at - timezone.make_aware(datetime.now(), timezone=tz)
+        if time_since_fb_started.minutes > 15:
             return ''
         return prev_row
 
@@ -213,6 +213,7 @@ class FbBotView(generic.View):
                 # This might be delivery, optin, postback for other events 
                 if 'message' in message:
                     bot_answer = ''
+                    pprint("LET'S GET PHASE NOW!")
                     row = self.get_temp_row(message)
                     feedback['phase'] = self.get_phase(message)
                     pprint('BEFORE CHECK_INPUT PHASE: %s' %(feedback['phase']))
