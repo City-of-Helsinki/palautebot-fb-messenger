@@ -206,10 +206,21 @@ class FbBotView(generic.View):
         #Send information to HKI database and return url to the feedback
         return 'www.google.fi'
 
+    def init_answers(self):
+        bot_answers = ['Virheellinen syöte. Kirjoita lyhyesti palautteesi (10-5000 merkkiä)',
+                       'Virheellinen syöte. Haluatko lisätä kuvan palautteeseen (kyllä/ei)?',
+                       'Virheellinen syöte. Liitä kuva',
+                       'Virheellinen syöte. Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?',
+                       'Virheellinen syöte. Liitä sijainti',
+                       'Virheellinen syöte. Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?',
+                       'Kirjoita osoite tai lisätiedot paikasta',]
+        return bot_answers
+
 
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
         feedback = self.init_feedback()
+        bot_answers = self.init_answers()
         # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
@@ -242,7 +253,7 @@ class FbBotView(generic.View):
                                 message=message['message']['text'],
                                 phase= feedback['phase']
                             )
-                            bot_answer = 'Haluatko lisätä kuvan palautteeseen(kyllä/ei)?'
+                            bot_answer = 'Haluatko lisätä kuvan palautteeseen (kyllä/ei)?'
 
                         elif feedback['phase'] == 1:
                             pprint('THIS IS PHASE 1')
@@ -325,7 +336,8 @@ class FbBotView(generic.View):
                         if row.id == '204695756714834':
                             pprint('Bot cannot post to itself')
                         else:
-                            post_facebook_message(message['sender']['id'], 'Check input didn\'t pass')
+                            bot_answer = 'Virheellinen syöte. %s' % (bot_answers[phase])
+                            post_facebook_message(message['sender']['id'], bot_answer)
         return HttpResponse()
 
 def post_facebook_message(fbid, recevied_message):
