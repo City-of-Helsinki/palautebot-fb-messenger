@@ -127,11 +127,12 @@ class FbBotView(generic.View):
                         pprint('RECORD FOUND')
                         return 0
                 except TypeError:
+                    print('TYPE ERROR')
                     return 0
-            else:
-                return 0
             if media_count != 0:
                 return 1
+            else:
+                return 0
 
         #PHASE 4: check if user has attached location/map
         elif phase == 4:
