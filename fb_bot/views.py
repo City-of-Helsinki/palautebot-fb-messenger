@@ -5,7 +5,6 @@ from datetime import datetime
 from django.db.models import Q
 from django.http.response import HttpResponse
 from django.shortcuts import render
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -15,7 +14,6 @@ from pprint import pprint
 import json
 import pytz
 import requests
-import time
 
 # Create your views here.
 class FbBotView(generic.View):
@@ -170,8 +168,14 @@ class FbBotView(generic.View):
         #TODO: SESSION AIKAKATKAISU
         print(datetime.now())
         print(prev_row.source_created_at)
-        tz = pytz.timezone(settings.TIMEZONE)
-        time_since_fb_started = prev_row.source_created_at - timezone.make_aware(datetime.now(), timezone=tz)
+
+        print(datetime.now())
+        print(datetime.now(settings.TIMEZONE))
+
+        time_since_fb_started = prev_row.source_created_at - datetime.now(settings.TIMEZONE)
+
+        print(time_since_fb_started)
+
         if time_since_fb_started.seconds > 900:
             Feedback.objects.filter(id=prev_row.id).delete()
             return ''
@@ -217,7 +221,7 @@ class FbBotView(generic.View):
                     pprint("LET'S GET PHASE NOW!")
                     row = self.get_temp_row(message)
                     feedback['phase'] = self.get_phase(message)
-                    pprint('BEFORE CHECK_INPUT PHASE: %s' %(feedback['phase']))
+                    pprint('BEFORE CHECK_INPUT PHASE = %s' %(feedback['phase']))
                     pprint(message)
                     user_input_valid = self.check_input(feedback['phase'], message, row.user_id)
                     if user_input_valid == 1 or user_input_valid == 2:
@@ -228,8 +232,7 @@ class FbBotView(generic.View):
                         if feedback['phase']== 0:
                             pprint('THIS IS PHASE 0')
                             feedback['phase'] = feedback['phase']+1
-                            tz = pytz.timezone(settings.TIMEZONE)
-                            feedback_start_at = timezone.make_aware(datetime.fromtimestamp(message['timestamp']/1000), timezone=tz)
+                            feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000, settings.TIMEZONE)
                             query_response = Feedback.objects.create(
                                 source_created_at=feedback_start_at,
                                 user_id=message['sender']['id'],
