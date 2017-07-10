@@ -147,6 +147,7 @@ class FbBotView(generic.View):
         return 0
 
     def get_temp_row(self, message):
+        url = ''
         try:
             for attachment in message['message']['attachments']:
                 url = attachment['payload']['url']
@@ -161,7 +162,8 @@ class FbBotView(generic.View):
                 message='temp',
                 phase=0,
             )
-        temp_row = Feedback.objects.filter(id=temp_row.id).update(media_url=url)
+        if url != '':
+            temp_row = Feedback.objects.filter(id=temp_row.id).update(media_url=url)
         return temp_row
 
     def get_feedback_to_update(self, user):
