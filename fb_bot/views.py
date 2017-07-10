@@ -166,12 +166,13 @@ class FbBotView(generic.View):
         if prev_row.ready:
             return ''
         #TODO: SESSION AIKAKATKAISU
-        print('######', datetime.now())
-        print(prev_row.source_created_at)
+        print('NOW ', datetime.now())
+        print('TIME FROM DB',prev_row.source_created_at)
+        print('TIME FROM DB MADE AWARE', prev_row.source_created_at.astimezone(settings.TIMEZONE))
 
-        print(datetime.now(settings.TIMEZONE))
+        print('NOW MADE AWARE', datetime.now(settings.TIMEZONE))
 
-        time_since_fb_started = prev_row.source_created_at - datetime.now(settings.TIMEZONE)
+        time_since_fb_started = prev_row.source_created_at.astimezone(settings.TIMEZONE) - datetime.now(settings.TIMEZONE)
 
         print('TIME', time_since_fb_started)
         print('SECONDS', time_since_fb_started.seconds)
@@ -232,10 +233,7 @@ class FbBotView(generic.View):
                         if feedback['phase']== 0:
                             pprint('THIS IS PHASE 0')
                             feedback['phase'] = feedback['phase']+1
-                            print('FB POST TIME', message['timestamp'])
-                            print('FB POST TIME DATETIME NOT AWARE', datetime.fromtimestamp(message['timestamp']/1000))
-                            print('FB POST TIME DATETIME AWARE', datetime.fromtimestamp(message['timestamp']/1000).astimezone(settings.TIMEZONE))
-                            feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000).astimezone(settings.TIMEZONE)
+                            feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000)
                             query_response = Feedback.objects.create(
                                 source_created_at=feedback_start_at,
                                 user_id=message['sender']['id'],
