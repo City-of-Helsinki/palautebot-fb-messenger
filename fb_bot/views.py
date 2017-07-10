@@ -174,7 +174,7 @@ class FbBotView(generic.View):
         time_since_fb_started = prev_row.source_created_at - datetime.now(settings.TIMEZONE)
 
         print('TIME', time_since_fb_started)
-        print('MINUTES', time_since_fb_started)
+        print('MINUTES', time_since_fb_started.minutes)
 
         if time_since_fb_started.seconds > 900:
             Feedback.objects.filter(id=prev_row.id).delete()
@@ -234,7 +234,8 @@ class FbBotView(generic.View):
                             feedback['phase'] = feedback['phase']+1
                             print('FB POST TIME', message['timestamp'])
                             print('FB POST TIME DATETIME NOT AWARE', datetime.fromtimestamp(message['timestamp']/1000))
-                            feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000, settings.TIMEZONE)
+                            print('FB POST TIME DATETIME AWARE', datetime.fromtimestamp(message['timestamp']/1000).astimezone(settings.TIMEZONE))
+                            feedback_start_at = datetime.fromtimestamp(message['timestamp']/1000).astimezone(settings.TIMEZONE)
                             query_response = Feedback.objects.create(
                                 source_created_at=feedback_start_at,
                                 user_id=message['sender']['id'],
