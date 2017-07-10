@@ -163,7 +163,8 @@ class FbBotView(generic.View):
                 phase=0,
             )
         if url != '':
-            temp_row = Feedback.objects.filter(id=temp_row.id).update(media_url=url)
+            update_row_count = Feedback.objects.filter(id=temp_row.id).update(media_url=url)
+            print('UPDATED TEMP_ROW WITH URL')
         return temp_row
 
     def get_feedback_to_update(self, user):
