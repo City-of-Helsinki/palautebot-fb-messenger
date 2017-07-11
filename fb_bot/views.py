@@ -43,9 +43,12 @@ class FbBotView(generic.View):
     def is_yes(self, message):
         #Function checks if given message matches acceptable accept_answers
         message = message.lower()
+        print('VASTAUS LOWER: ', message)
         message = message.strip(',.-!?:;')
+        print('VASTAUS STRIP: ', message)
         accept_answers = ['kyllä', 'joo', 'juu', 'k']
         if any(message in s for s in accept_answers):
+            print('IF/FOR LOOPPI S: ', s)
             return True
         else:
             return False
