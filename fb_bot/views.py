@@ -281,8 +281,8 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 2:
                             pprint('THIS IS PHASE 2')
-                            for attachment in message['message']
-                            ['attachments']:
+                            for attachment in (message['message']
+                            ['attachments']):
                                 if 'url' in attachment['payload']:
                                     feedback['url'] = attachment['payload']
                                     ['url']
