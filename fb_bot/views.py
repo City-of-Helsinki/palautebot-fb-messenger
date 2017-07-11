@@ -78,7 +78,7 @@ class FbBotView(generic.View):
         #check if message contains the supported information OR bot's own message
         try:
             user_input = message['message']['text']
-            if any(user_input in s for s in bot_messages):
+            if any(user_input == s for s in bot_messages):
                 pprint("check_input bot message detected and working")
                 return 0
         except (KeyError, TypeError) as e:
