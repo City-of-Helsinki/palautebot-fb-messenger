@@ -82,6 +82,12 @@ class FbBotView(generic.View):
             else:
                 return 0
 
+        if isinstance(user_input, str) and phase > 0:
+            message = user_input.lower()
+            message = message.strip(',.-!?:;')
+            if message == 'peruuta':
+                return 3
+
         # PHASE 0 & PHASE 6: check if message is between 10 and 5000 marks
         if phase == 0 or phase == 6:
             string_length = len(user_input)
@@ -218,12 +224,27 @@ class FbBotView(generic.View):
             'Kirjoita lyhyesti palautteesi (10-5000 merkkiä)',
             'Haluatko lisätä kuvan palautteeseen (kyllä/ei)?',
             'Liitä kuva',
-            'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?',
-            'Liitä sijainti',
+            'Haluatko lisätä sijantitiedon palautteeseen (kyllä/ei)?',
+            'Liitä sijainti puhelimestasi',
             'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?',
             'Kirjoita osoite tai lisätiedot paikasta', ]
         return answers
 
+    def cancel_previous_step(self, phase, id):
+        if phase == 0:
+            Feedback.objects.filter(id=id).update(phase=phase, message='')
+        elif phase == 1:
+            Feedback.objects.filter(id=id).update(phase=phase)
+        elif phase == 2:
+            Feedback.objects.filter(id=id).update(phase=phase, meida_url='')
+        elif phase == 3:
+            Feedback.objects.filter(id=id).update(phase=phase)
+        elif phase == 4:
+            Feedback.objects.filter(id=id).update(phase=phase, lat_coordinate='', long_coordinate='')
+        elif phase == 5:
+            Feedback.objects.filter(id=id).update(phase=phase)
+        elif phase == 6:
+            Feedback.objects.filter(id=id).update(phase=phase, address='')
     def post(self, request, *args, **kwargs):
         # Post function to handle Facebook messages
         feedback = self.init_feedback()
@@ -244,17 +265,26 @@ class FbBotView(generic.View):
                     pprint('BEFORE CHECK_INPUT PHASE = %s' % (
                         feedback['phase']))
                     pprint(message)
-                    user_input_valid = self.check_input(
+                    input_valid = self.check_input(
                         feedback['phase'],
                         message,
                         row.user_id,
                         bot_answers
                         )
-                    if user_input_valid == 1 or user_input_valid == 2:
+                    if (input_valid == 1 or input_valid == 2 or
+                        input_valid == 3):
                         pprint('check_input == true')
                         row = self.get_temp_row(message)
                         user = row.user_id
                         prev_row = self.get_feedback_to_update(user)
+                        if input_valid == 3:
+                            feedback['phase'] -= 1
+                            self.cancel_previous_step(feedback['phase'], prev_row.id)
+                            bot_answer = bot_answers[feedback['phase']]
+                            post_facebook_message(
+                                    message['sender']['id'],
+                                    bot_answer)
+                            break
                         if feedback['phase'] == 0:
                             pprint('THIS IS PHASE 0')
                             feedback['phase'] = feedback['phase']+1
@@ -271,9 +301,9 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 1:
                             pprint('THIS IS PHASE 1')
-                            if user_input_valid == 1:
+                            if input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
-                            elif user_input_valid == 2:
+                            elif input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                             bot_answer = bot_answers[feedback['phase']]
                             query_response = Feedback.objects.filter(
@@ -297,9 +327,9 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 3:
                             pprint('THIS IS PHASE 3')
-                            if user_input_valid == 1:
+                            if input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
-                            elif user_input_valid == 2:
+                            elif input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                             bot_answer = bot_answers[feedback['phase']]
                             query_response = Feedback.objects.filter(
@@ -327,10 +357,10 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 5:
                             pprint('THIS IS PHASE 5')
-                            if user_input_valid == 1:
+                            if input_valid == 1:
                                 feedback['phase'] = feedback['phase']+1
                                 bot_answer = bot_answers[feedback['phase']]
-                            elif user_input_valid == 2:
+                            elif input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
                                 url = self.save_to_hki_database(feedback)
                                 bot_answer = '''Kiitos palautteestasi!
@@ -397,7 +427,11 @@ class FbBotView(generic.View):
                             if feedback['phase'] == 9:
                                 pass
                             else:
-                                bot_answer = 'Virheellinen syöte. %s' % (
+                                msg1 = 'Virheellinen syöte, voit ohittaa'
+                                msg2 = 'tämän vaiheen kirjoittamalla \'peruuta\''
+                                bot_answer = '%s %s\n %s' % (
+                                    msg1
+                                    msg2,
                                     bot_answers[feedback['phase']])
                                 post_facebook_message(
                                     message['sender']['id'],
