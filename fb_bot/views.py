@@ -103,8 +103,8 @@ class FbBotView(generic.View):
             media_count = 0
             for attachment in user_input:
                 try:
-                    if attachment['type'] == 'image' or
-                    attachment['type'] == 'video':
+                    if (attachment['type'] == 'image'
+                    or attachment['type'] == 'video'):
                         if 'url' in attachment['payload']:
                             media_count = media_count+1
                             pprint('IMAGE %s FOUND' % (media_count))
