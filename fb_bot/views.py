@@ -48,7 +48,6 @@ class FbBotView(generic.View):
         print('VASTAUS STRIP: ', message)
         accept_answers = ['kyllä', 'joo', 'juu', 'k']
         if any(message in s for s in accept_answers):
-            print('IF/FOR LOOPPI S: ', s)
             return True
         else:
             return False
