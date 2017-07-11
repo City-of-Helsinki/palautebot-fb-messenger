@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 from chatbot import settings
 from datetime import datetime
-from django.db.models import Q
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -17,12 +16,6 @@ import requests
 
 # Create your views here.
 class FbBotView(generic.View):
-    # WELCOME MESSAGE
-    # post_message_url = 'https://graph.facebook.com/v2.6/me/thread_settings?access_token=%s' %(settings.FACEBOOK_PAGE_ACCESS_TOKEN)
-    # response_msg = json.dumps({"setting_type":"greeting","greeting":{"text": "This is greeting text"}})
-    # status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
-    # pprint(status.json())
-
     def get(self, request, *args, **kwargs):
         if self.request.GET['hub.verify_token'] == '123456789123456789':
             return HttpResponse(self.request.GET['hub.challenge'])
@@ -70,8 +63,6 @@ class FbBotView(generic.View):
     def check_input(self, phase, message, user):
         #Function checks if aquired message is valid
         #Returns 0 (bad answer), 1 (Yes) or 2(No)
-
-        #check if message has been sent within 15minutes from the start of feedback
 
         bot_messages = ['Facebook messenger feedback', 
                         'Check input didn\'t pass',
@@ -155,6 +146,10 @@ class FbBotView(generic.View):
         return 0
 
     def get_temp_row(self, message):
+        #Function creates and returns a temporary database row
+        #Temporary row is used in getting user_id and media_url
+        #In facebook data media_url and user_id are facebook objects and string value of url and 
+        #temporary row in database was the easiest way around
         url = ''
         try:
             for attachment in message['message']['attachments']:
@@ -176,6 +171,8 @@ class FbBotView(generic.View):
         return temp_row
 
     def get_feedback_to_update(self, user):
+        #Function returns a previous feedback information if feedback giving is still in progress
+        #meaning that Feedback is not complete, and less than 15 minutes has passed from the start of feedback
         try: 
             prev_row = Feedback.objects.filter(user_id=user).exclude(message='temp').latest('source_created_at')
         except Feedback.DoesNotExist:
@@ -211,6 +208,9 @@ class FbBotView(generic.View):
         return 'www.google.fi'
 
     def init_answers(self):
+        #Function initializes answer list
+        #Order of items is important because these are being used with index numbers
+        #... bot_answers[currentPhase]
         bot_answers = ['Kirjoita lyhyesti palautteesi (10-5000 merkkiä)',
                        'Haluatko lisätä kuvan palautteeseen (kyllä/ei)?',
                        'Liitä kuva',
@@ -221,15 +221,15 @@ class FbBotView(generic.View):
         return bot_answers
 
 
-    # Post function to handle Facebook messages
+
     def post(self, request, *args, **kwargs):
+        # Post function to handle Facebook messages
         feedback = self.init_feedback()
         bot_answers = self.init_answers()
         # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
         # multiple messages in a single call during high load
-        # pprint(incoming_message)
         for entry in incoming_message['entry']:
             for message in entry['messaging']:
                 # Check to make sure the received call is a message call
