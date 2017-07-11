@@ -236,7 +236,7 @@ class FbBotView(generic.View):
         elif phase == 1:
             Feedback.objects.filter(id=id).update(phase=phase)
         elif phase == 2:
-            Feedback.objects.filter(id=id).update(phase=phase, meida_url='')
+            Feedback.objects.filter(id=id).update(phase=phase, media_url='')
         elif phase == 3:
             Feedback.objects.filter(id=id).update(phase=phase)
         elif phase == 4:
