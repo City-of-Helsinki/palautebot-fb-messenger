@@ -125,8 +125,8 @@ class FbBotView(generic.View):
         elif phase == 4:
             for attachment in user_input:
                 try:
-                    if 'lat' in attachment['payload']['coordinates']
-                    and 'long' in attachment['payload']['coordinates']:
+                    if ('lat' in attachment['payload']['coordinates']
+                    and 'long' in attachment['payload']['coordinates']):
                         pprint('Location found in the post')
                         return 1
                     else:
