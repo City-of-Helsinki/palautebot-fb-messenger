@@ -430,7 +430,7 @@ class FbBotView(generic.View):
                                 msg1 = 'Virheellinen syöte, voit ohittaa'
                                 msg2 = 'tämän vaiheen kirjoittamalla \'peruuta\''
                                 bot_answer = '%s %s\n %s' % (
-                                    msg1
+                                    msg1,
                                     msg2,
                                     bot_answers[feedback['phase']])
                                 post_facebook_message(
