@@ -62,18 +62,10 @@ class FbBotView(generic.View):
         else:
             return False
 
-    def check_input(self, phase, message, user):
+    def check_input(self, phase, message, user, bot_messages):
         #Function checks if aquired message is valid
         #Returns 0 (bad answer), 1 (Yes) or 2(No)
 
-        bot_messages = ['Facebook messenger feedback', 
-                        'Check input didn\'t pass',
-                        'Haluatko lisätä kuvan palautteeseen(kyllä/ei)?',
-                        'Haluatko lisätä sijantitiedon palautteeseen(kyllä/ei)?',
-                        'Liitä kuva',
-                        'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?',
-                        'Liitä sijainti',
-                        'Kirjoita osoite tai lisätiedot paikasta']
         #check if message contains the supported information OR bot's own message
         try:
             user_input = message['message']['text']
@@ -243,7 +235,7 @@ class FbBotView(generic.View):
                     feedback['phase'] = self.get_phase(message)
                     pprint('BEFORE CHECK_INPUT PHASE = %s' %(feedback['phase']))
                     pprint(message)
-                    user_input_valid = self.check_input(feedback['phase'], message, row.user_id)
+                    user_input_valid = self.check_input(feedback['phase'], message, row.user_id, bot_answers)
                     if user_input_valid == 1 or user_input_valid == 2:
                         pprint('check_input == true')
                         row = self.get_temp_row(message)
