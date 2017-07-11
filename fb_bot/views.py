@@ -159,7 +159,7 @@ class FbBotView(generic.View):
                     message='temp',
                     phase=0,
                 )
-        except KeyError:
+        except (KeyError, TypeError) as e:
             temp_row, created = Feedback.objects.get_or_create(
                 user_id=message['sender']['id'],
                 message='temp',
