@@ -427,11 +427,14 @@ class FbBotView(generic.View):
                             if feedback['phase'] == 9:
                                 pass
                             else:
-                                msg1 = 'Virheellinen syöte, voit ohittaa'
-                                msg2 = 'tämän vaiheen kirjoittamalla \'peruuta\''
+                                if feedback['phase'] == 0:
+                                    msg1 = 'Virheellinen syöte.'
+                                    msg2 = ''
+                                else:
+                                    msg1 = 'Virheellinen syöte, voit peruuttaa'
+                                    msg2 = 'tämän vaiheen kirjoittamalla \'peruuta\''
                                 bot_answer = '%s %s\n %s' % (
-                                    msg1,
-                                    msg2,
+                                    msg1, msg2,
                                     bot_answers[feedback['phase']])
                                 post_facebook_message(
                                     message['sender']['id'],
