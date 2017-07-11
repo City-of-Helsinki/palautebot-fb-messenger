@@ -407,8 +407,8 @@ class FbBotView(generic.View):
 
 
 def post_facebook_message(fbid, recevied_message):
-    post_message_url =
-    'https://graph.facebook.com/v2.6/me/messages?access_token=%s' % (
+    post_message_url = '''
+    https://graph.facebook.com/v2.6/me/messages?access_token=%s''' % (
         settings.FACEBOOK_PAGE_ACCESS_TOKEN
         )
     response_msg = json.dumps({
