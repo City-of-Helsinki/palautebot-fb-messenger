@@ -11,13 +11,6 @@
     - Link to the updated privacy policy
     - Icon (1024x1024)
 
-
-
-
-FACEBOOK_PAGE_ID= ''
-FACEBOOK_PAGE_ACCESS_TOKEN = ''
-HELSINKI_API_KEY = ''
-
 ## Setting up Facebook Messenger Bot
 
 - Create a facebook page for the bot (if not already done)
