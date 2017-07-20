@@ -314,8 +314,8 @@ class FbBotView(generic.View):
                             for attachment in (message['message']
                             ['attachments']):
                                 if 'url' in attachment['payload']:
-                                    feedback['url'] = attachment['payload']
-                                    ['url']
+                                    feedback['url'] = (attachment['payload']
+                                    ['url'])
                                     break
                             feedback['phase'] = feedback['phase']+1
                             query_response = Feedback.objects.filter(
@@ -341,10 +341,10 @@ class FbBotView(generic.View):
                             ['attachments']):
                                 if 'lat' in (attachment['payload']
                                 ['coordinates']):
-                                    feedback['lat'] = attachment['payload']
-                                    ['coordinates']['lat']
-                                    feedback['long'] = attachment['payload']
-                                    ['coordinates']['long']
+                                    feedback['lat'] = (attachment['payload']
+                                    ['coordinates']['lat'])
+                                    feedback['long'] = (attachment['payload']
+                                    ['coordinates']['long'])
                                     feedback['phase'] = feedback['phase']+1
                                     break
                             query_response = Feedback.objects.filter(
@@ -387,12 +387,13 @@ class FbBotView(generic.View):
                             pprint('THIS IS PHASE 6')
                             feedback['address'] = message['message']['text']
                             url = self.save_to_hki_database(feedback)
-                            bot_answer = '''Kiitos palautteestasi!
-                                Voit seurata palautteen käsittelyä
-                                oheisesta linkistä %s\n\n
-                                Voit antaa uuden palautteen kirjoittamalla
-                                sen lyhyesti tähän
-                                keskusteluun (10-5000 merkkiä)''' % (url)
+                            msg1 = 'Kiitos palautteestasi! Voit seurata '
+                            msg2 = 'palautteen käsittelyä oheisesta linkistä '
+                            msg3 = 'Voit aloittaa uuden palautteen kirjoit'
+                            msg4 = 'tamalla sen lyhyesti tähän keskusteluun '
+                            msg5 = '(10-5000 merkkiä)'
+                            bot_answer = '%s%s%s%s%s%s' % (msg1, msg2, url,
+                                msg3, msg4, msg5)
                             if url != '':
                                 feedback['phase'] = 0
                                 query_response = Feedback.objects.filter(
