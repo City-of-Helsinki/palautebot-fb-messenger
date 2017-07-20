@@ -365,7 +365,7 @@ class FbBotView(generic.View):
                                 url = self.save_to_hki_database(feedback)
                                 msg1 = 'Kiitos palautteestasi! Voit seurata '
                                 msg2 = 'palautteen käsittelyä oheisesta linkistä '
-                                msg3 = 'Voit aloittaa uuden palautteen kirjoit'
+                                msg3 = ' Voit aloittaa uuden palautteen kirjoit'
                                 msg4 = 'tamalla sen lyhyesti tähän keskusteluun '
                                 msg5 = '(10-5000 merkkiä)'
                                 bot_answer = '%s%s%s%s%s%s' % (msg1, msg2, url,
