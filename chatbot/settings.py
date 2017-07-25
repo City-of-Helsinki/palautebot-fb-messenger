@@ -18,6 +18,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 FACEBOOK_PAGE_ACCESS_TOKEN = os.environ.get('FACEBOOK_PAGE_ACCESS_TOKEN', None)
+HELSINKI_API_KEY = os.environ.get('HELSINKI_API_KEY', None)
+HELSINKI_API_SERVICE_CODE = os.environ.get('HELSINKI_API_SERVICE_CODE', None)
+HELSINKI_POST_API_URL = os.environ.get('HELSINKI_POST_API_URL', None)
 #Construct timezone object
 TIMEZONE = pytz.timezone('Europe/Helsinki')
 
