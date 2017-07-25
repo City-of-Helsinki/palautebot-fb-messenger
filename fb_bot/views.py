@@ -467,7 +467,7 @@ class FbBotView(generic.View):
                                     msg2 = 'tämän vaiheen kirjoittamalla \'peruuta\''
                                 bot_answer = '%s %s\n %s' % (
                                     msg1, msg2,
-                                    bot_answers[feedback['phase']])
+                                    [feedback['phase']])
                                 post_facebook_message(
                                     message['sender']['id'],
                                     bot_answer
