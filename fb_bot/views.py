@@ -247,6 +247,7 @@ class FbBotView(generic.View):
         # Send information to HKI database and return url to the feedback
         feedback['api_key'] = settings.HELSINKI_API_KEY
         feedback['service_code'] = settings.HELSINKI_API_SERVICE_CODE
+        print(feedback)
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         response_new_ticket = requests.post(settings.HELSINKI_POST_API_URL,
             data=feedback, headers=headers)
