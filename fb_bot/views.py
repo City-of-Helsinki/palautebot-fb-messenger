@@ -459,7 +459,7 @@ class FbBotView(generic.View):
                                 bot_answer = '%s%s%s%s' % (msg1,
                                     msg2, msg3, msg4)
                                 query_response = Feedback.objects.filter(
-                                    id=prev_row_id).update(
+                                    id=prev_row.id).update(
                                     phase=0,
                                     message = '',
                                     lat_coordinate = '',
@@ -476,7 +476,7 @@ class FbBotView(generic.View):
                         else:
                             pprint('PHASE 7 AND 8 ERROR')
                             query_response = Feedback.objects.filter(
-                                    id=prev_row_id).update(
+                                    id=prev_row.id).update(
                                     phase=0,
                                     message = '',
                                     lat_coordinate = '',
