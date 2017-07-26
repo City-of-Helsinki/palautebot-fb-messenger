@@ -295,6 +295,7 @@ class FbBotView(generic.View):
                 # This might be delivery, optin, postback for other events
                 if 'message' in message:
                     bot_answer = ''
+                    query_response = ''
                     pprint("LET'S GET PHASE NOW!")
                     row = self.get_temp_row(message)
                     feedback['phase'] = self.get_phase(message)
