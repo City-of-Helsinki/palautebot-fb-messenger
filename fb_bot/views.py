@@ -145,13 +145,13 @@ class FbBotView(generic.View):
         # PHASE 9: Bot message doesn't need validating
         elif phase == 9:
             return 0
-        return 0
+        else:
+            return 1
 
         # FAULTY PHASES
         # Bot accepts all messages in faulty phases because
         # they are handled in POST function
-        else:
-            return 1
+
 
     def get_temp_row(self, message):
         # Function creates and returns a temporary database row
@@ -427,7 +427,7 @@ class FbBotView(generic.View):
                                         long_coordinate = '',
                                         media_url = '',
                                         street_address = '',
-                                        ready=False)
+                                        ready=False)sug
                             query_response = Feedback.objects.filter(
                                 id=prev_row.id).update(phase=feedback['phase'])
 
