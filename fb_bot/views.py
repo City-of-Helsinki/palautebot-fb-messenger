@@ -476,18 +476,20 @@ class FbBotView(generic.View):
                         else:
                             pprint('PHASE 7 AND 8 ERROR')
                             query_response = Feedback.objects.filter(
-                                    id=prev_row.id).update(
-                                    phase=0,
-                                    message = '',
-                                    lat_coordinate = '',
-                                    long_coordinate = '',
-                                    media_url = '',
-                                    street_address = '',
-                                    ready=False)
-                            msg1 = 'Pahoittelut, jokin meni vikaan. '
-                            msg2 = 'Voit yrittää palautteen lisäämistä '
-                            msg3 = '15 minuutin kuluttua uudelleen.'
-                            bot_answer = '%s%s%s' % (msg1, msg2, msg3)
+                                id=prev_row.id).update(
+                                phase=0,
+                                message = '',
+                                lat_coordinate = '',
+                                long_coordinate = '',
+                                media_url = '',
+                                street_address = '',
+                                ready=False)
+                            msg1 = 'Palautteen tallentaminen epäonnistui.'
+                            msg2 = '\n\nVoit yrittää uudelleen kirjoit'
+                            msg3 = 'tamalla palautteesi lyhyesti tähän '
+                            msg4 = 'keskusteluun(10-5000 merkkiä).'
+                            bot_answer = '%s%s%s%s' % (msg1,
+                                msg2, msg3, msg4)
                         post_facebook_message(
                             message['sender']['id'],
                             bot_answer
@@ -509,8 +511,7 @@ class FbBotView(generic.View):
                                     msg1 = 'Virheellinen syöte, voit peruuttaa'
                                     msg2 = 'tämän vaiheen kirjoittamalla \'peruuta\''
                                 bot_answer = '%s %s\n %s' % (
-                                    msg1, msg2,
-                                    [feedback['phase']])
+                                    msg1, msg2)
                                 post_facebook_message(
                                     message['sender']['id'],
                                     bot_answer
