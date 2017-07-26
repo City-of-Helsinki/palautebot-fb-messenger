@@ -472,8 +472,22 @@ class FbBotView(generic.View):
                             pprint('THIS IS PHASE 9')
                             pprint('Bot message ignored!')
                             continue
+
                         else:
                             pprint('PHASE 7 AND 8 ERROR')
+                            query_response = Feedback.objects.filter(
+                                    id=prev_row_id).update(
+                                    phase=0,
+                                    message = '',
+                                    lat_coordinate = '',
+                                    long_coordinate = '',
+                                    media_url = '',
+                                    street_address = '',
+                                    ready=False)
+                            msg1 = 'Pahoittelut, jokin meni vikaan. '
+                            msg2 = 'Voit yrittää palautteen lisäämistä '
+                            msg3 = '15 minuutin kuluttua uudelleen.'
+                            bot_answer = '%s%s%s' % (msg1, msg2, msg3)
                         post_facebook_message(
                             message['sender']['id'],
                             bot_answer
