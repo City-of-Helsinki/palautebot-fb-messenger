@@ -31,12 +31,12 @@ class FbBotView(generic.View):
         # while the script is running
         feedback = {}
         feedback['title'] = 'Facebook messenger feedback'
-        feedback['address'] = ''
+        feedback['address_string'] = ''
         feedback['description'] = ''
         feedback['phase'] = 0
         feedback['lat'] = ''
         feedback['long'] = ''
-        feedback['media'] = ''
+        feedback['media_url'] = ''
         feedback['timestamp'] = ''
         return feedback
 
@@ -254,11 +254,13 @@ class FbBotView(generic.View):
         feedback['api_key'] = settings.HELSINKI_API_KEY
         feedback['service_code'] = settings.HELSINKI_API_SERVICE_CODE
         print(feedback)
+        print(settings.HELSINKI_POST_API_URL)
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         response_new_ticket = requests.post(settings.HELSINKI_POST_API_URL,
             data=feedback, headers=headers)
         url_to_feedback = ''
         new_ticket = response_new_ticket.json()
+
         print(new_ticket)
         for entry in new_ticket:
             if 'code' in entry:
@@ -280,6 +282,15 @@ class FbBotView(generic.View):
         except KeyError as e:
             print('New data doesn\'t contain service_request_id %s' % (new_ticket))
         return url_to_feedback
+
+    def prepare_ticket(self, feedback, row):
+        feedback['address_string'] = row.address
+        feedback['description'] = row.description
+        feedback['lat'] = row.lat
+        feedback['long'] = row.long
+        feedback['media_url'] = row.media_url
+        feedback['timestamp'] = row.source_created_at
+        return feedback
 
     def post(self, request, *args, **kwargs):
         # Post function to handle Facebook messages
@@ -404,25 +415,27 @@ class FbBotView(generic.View):
                                 bot_answer = bot_answers[feedback['phase']]
                             elif input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
+                                feedback = self.prepare_ticket(feedback, prev_row)
                                 url = self.save_to_hki_database(feedback)
-                                msg1 = 'Kiitos palautteestasi! Voit seurata '
-                                msg2 = 'palautteen käsittelyä oheisesta linkistä '
-                                msg3 = '\n\nVoit aloittaa uuden palautteen kirjoit'
-                                msg4 = 'tamalla sen lyhyesti tähän keskusteluun '
-                                msg5 = '(10-5000 merkkiä)'
-                                bot_answer = '%s%s%s%s%s%s' % (msg1, msg2, url,
-                                    msg3, msg4, msg5)
                                 if url != '':
+                                    msg1 = 'Kiitos palautteestasi! Voit seurata '
+                                    msg2 = 'palautteen käsittelyä oheisesta linkistä '
+                                    msg3 = '\n\nVoit aloittaa uuden palautteen kirjoit'
+                                    msg4 = 'tamalla sen lyhyesti tähän keskusteluun '
+                                    msg5 = '(10-5000 merkkiä)'
+                                    bot_answer = '%s%s%s%s%s%s' % (msg1, msg2, url,
+                                        msg3, msg4, msg5)
                                     query_response = Feedback.objects.filter(
                                         id=prev_row.id).update(
                                         phase=feedback['phase'],
                                         ready=True
                                         )
                                 else:
+                                    feedback['phase'] = 0
                                     msg1 = 'Palautteen tallentaminen epäonnistui.'
                                     msg2 = '\n\nVoit yrittää uudelleen kirjoit'
                                     msg3 = 'tamalla palautteesi lyhyesti tähän '
-                                    msg4 = 'keskusteluun(10-5000 merkkiä).'
+                                    msg4 = 'keskusteluun (10-5000 merkkiä).'
                                     bot_answer = '%s%s%s%s' % (msg1,
                                         msg2, msg3, msg4)
                                     query_response = Feedback.objects.filter(
@@ -439,28 +452,29 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 6:
                             pprint('THIS IS PHASE 6')
-                            feedback['address'] = message['message']['text']
+                            feedback['address_string'] = message['message']['text']
                             url = self.save_to_hki_database(feedback)
-                            msg1 = 'Kiitos palautteestasi! Voit seurata '
-                            msg2 = 'palautteen käsittelyä oheisesta linkistä '
-                            msg3 = '\n\nVoit aloittaa uuden palautteen kirjoit'
-                            msg4 = 'tamalla sen lyhyesti tähän keskusteluun '
-                            msg5 = '(10-5000 merkkiä)'
-                            bot_answer = '%s%s%s%s%s%s' % (msg1, msg2, url,
-                                msg3, msg4, msg5)
                             if url != '':
+                                msg1 = 'Kiitos palautteestasi! Voit seurata '
+                                msg2 = 'palautteen käsittelyä oheisesta linkistä '
+                                msg3 = '\n\nVoit aloittaa uuden palautteen kirjoit'
+                                msg4 = 'tamalla sen lyhyesti tähän keskusteluun '
+                                msg5 = '(10-5000 merkkiä)'
+                                bot_answer = '%s%s%s%s%s%s' % (msg1, msg2, url,
+                                    msg3, msg4, msg5)
                                 feedback['phase'] = 0
                                 query_response = Feedback.objects.filter(
                                     id=prev_row.id).update(
                                     phase=feedback['phase'],
                                     ready=True,
-                                    street_address=feedback['address']
+                                    street_address=feedback['address_string']
                                     )
                             else:
+                                feedback['phase'] = 0
                                 msg1 = 'Palautteen tallentaminen epäonnistui.'
                                 msg2 = '\n\nVoit yrittää uudelleen kirjoit'
                                 msg3 = 'tamalla palautteesi lyhyesti tähän '
-                                msg4 = 'keskusteluun(10-5000 merkkiä).'
+                                msg4 = 'keskusteluun (10-5000 merkkiä).'
                                 bot_answer = '%s%s%s%s' % (msg1,
                                     msg2, msg3, msg4)
                                 query_response = Feedback.objects.filter(
