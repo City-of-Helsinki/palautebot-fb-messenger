@@ -427,7 +427,7 @@ class FbBotView(generic.View):
                                         long_coordinate = '',
                                         media_url = '',
                                         street_address = '',
-                                        ready=False)sug
+                                        ready=False)
                             query_response = Feedback.objects.filter(
                                 id=prev_row.id).update(phase=feedback['phase'])
 
