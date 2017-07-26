@@ -147,6 +147,12 @@ class FbBotView(generic.View):
             return 0
         return 0
 
+        # FAULTY PHASES
+        # Bot accepts all messages in faulty phases because
+        # they are handled in POST function
+        else:
+            return 1
+
     def get_temp_row(self, message):
         # Function creates and returns a temporary database row
         # Temporary row is used in getting user_id and media_url
@@ -407,10 +413,21 @@ class FbBotView(generic.View):
                                         ready=True
                                         )
                                 else:
-                                    post_facebook_message(
-                                        message['sender']['id'],
-                                        'Viestin tallentaminen epäonnistui'
-                                        )
+                                    msg1 = 'Palautteen tallentaminen epäonnistui.'
+                                    msg2 = '\n\nVoit yrittää uudelleen kirjoit'
+                                    msg3 = 'tamalla palautteesi lyhyesti tähän '
+                                    msg4 = 'keskusteluun(10-5000 merkkiä).'
+                                    bot_answer = '%s%s%s%s' % (msg1,
+                                        msg2, msg3, msg4)
+                                    query_response = Feedback.objects.filter(
+                                        id=prev_row_id).update(
+                                        phase=0,
+                                        message = '',
+                                        lat_coordinate = '',
+                                        long_coordinate = '',
+                                        media_url = '',
+                                        street_address = '',
+                                        ready=False)
                             query_response = Feedback.objects.filter(
                                 id=prev_row.id).update(phase=feedback['phase'])
 
@@ -434,10 +451,21 @@ class FbBotView(generic.View):
                                     street_address=feedback['address']
                                     )
                             else:
-                                post_facebook_message(
-                                    message['sender']['id'],
-                                    'Viestin tallentaminen epäonnistui'
-                                    )
+                                msg1 = 'Palautteen tallentaminen epäonnistui.'
+                                msg2 = '\n\nVoit yrittää uudelleen kirjoit'
+                                msg3 = 'tamalla palautteesi lyhyesti tähän '
+                                msg4 = 'keskusteluun(10-5000 merkkiä).'
+                                bot_answer = '%s%s%s%s' % (msg1,
+                                    msg2, msg3, msg4)
+                                query_response = Feedback.objects.filter(
+                                    id=prev_row_id).update(
+                                    phase=0,
+                                    message = '',
+                                    lat_coordinate = '',
+                                    long_coordinate = '',
+                                    media_url = '',
+                                    street_address = '',
+                                    ready=False)
 
                         elif feedback['phase'] == 9:
                             pprint('THIS IS PHASE 9')
