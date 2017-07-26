@@ -284,7 +284,7 @@ class FbBotView(generic.View):
         return url_to_feedback
 
     def prepare_ticket(self, feedback, row):
-        feedback['address_string'] = row.address
+        feedback['address_string'] = row.street_address
         feedback['description'] = row.description
         feedback['lat'] = row.lat
         feedback['long'] = row.long
