@@ -453,6 +453,7 @@ class FbBotView(generic.View):
                         elif feedback['phase'] == 6:
                             pprint('THIS IS PHASE 6')
                             feedback['address_string'] = message['message']['text']
+                            feedback = self.prepare_ticket(feedback, prev_row)
                             url = self.save_to_hki_database(feedback)
                             if url != '':
                                 msg1 = 'Kiitos palautteestasi! Voit seurata '
