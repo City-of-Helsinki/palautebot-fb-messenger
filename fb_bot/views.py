@@ -43,9 +43,7 @@ class FbBotView(generic.View):
     def is_yes(self, message):
         # Function checks if given message matches acceptable accept_answers
         message = message.lower()
-        print('VASTAUS LOWER: ', message)
         message = message.strip(',.-!?:;')
-        print('VASTAUS STRIP: ', message)
         accept_answers = ['kyllä', 'joo', 'juu', 'k']
         if any(message in s for s in accept_answers):
             return True
@@ -68,10 +66,10 @@ class FbBotView(generic.View):
 
         # check if message contains the supported information
         # OR bot's own message
+        pprint('Check_input...')
         try:
             user_input = message['message']['text']
             if any(user_input == s for s in bot_messages):
-                pprint("check_input bot message detected and working")
                 return 0
         except (KeyError, TypeError) as e:
             if phase == 2 or phase == 4:
@@ -113,14 +111,11 @@ class FbBotView(generic.View):
                     or attachment['type'] == 'video'):
                         if 'url' in attachment['payload']:
                             media_count = media_count+1
-                            pprint('IMAGE %s FOUND' % (media_count))
                         else:
                             pass
                     else:
-                        pprint('RECORD FOUND')
                         return 0
                 except TypeError:
-                    print('TYPE ERROR')
                     return 0
             if media_count != 0:
                 return 1
@@ -133,7 +128,6 @@ class FbBotView(generic.View):
                 try:
                     if ('lat' in attachment['payload']['coordinates']
                     and 'long' in attachment['payload']['coordinates']):
-                        pprint('Location found in the post')
                         return 1
                     else:
                         return 0
@@ -145,12 +139,14 @@ class FbBotView(generic.View):
         # PHASE 9: Bot message doesn't need validating
         elif phase == 9:
             return 0
+
+        # BAD PHASES
+        # Bot accepts all messages in bad phases because
+        # they are handled in POST function
         else:
             return 1
 
-        # FAULTY PHASES
-        # Bot accepts all messages in faulty phases because
-        # they are handled in POST function
+
 
 
     def get_temp_row(self, message):
@@ -250,18 +246,18 @@ class FbBotView(generic.View):
 
 
     def save_to_hki_database(self, feedback):
-        # Send information to HKI database and return url to the feedback
+        # Send information to HKI database and returns url to the feedback
         feedback['api_key'] = settings.HELSINKI_API_KEY
         feedback['service_code'] = settings.HELSINKI_API_SERVICE_CODE
-        print(feedback)
-        print(settings.HELSINKI_POST_API_URL)
+        if settings.DEBUG:
+            pprint('Information to the API: ', feedback)
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         response_new_ticket = requests.post(settings.HELSINKI_POST_API_URL,
             data=feedback, headers=headers)
         url_to_feedback = ''
         new_ticket = response_new_ticket.json()
-
-        print(new_ticket)
+        if settings.DEBUG:
+            pprint(new_ticket)
         for entry in new_ticket:
             if 'code' in entry:
                 print('ERROR: ', entry['code'])
@@ -284,6 +280,7 @@ class FbBotView(generic.View):
         return url_to_feedback
 
     def prepare_ticket(self, feedback, row):
+        # Assigns information from database to feedback dictionary and returns feedback dictionary
         feedback['address_string'] = row.street_address
         feedback['description'] = row.message
         feedback['lat'] = row.lat_coordinate
@@ -452,8 +449,8 @@ class FbBotView(generic.View):
 
                         elif feedback['phase'] == 6:
                             pprint('THIS IS PHASE 6')
-                            feedback['address_string'] = message['message']['text']
                             feedback = self.prepare_ticket(feedback, prev_row)
+                            feedback['address_string'] = message['message']['text']
                             url = self.save_to_hki_database(feedback)
                             if url != '':
                                 msg1 = 'Kiitos palautteestasi! Voit seurata '
