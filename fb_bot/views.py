@@ -285,11 +285,12 @@ class FbBotView(generic.View):
     def prepare_ticket(self, feedback, row):
         # Assigns information from database to feedback dictionary
         # and returns feedback dictionary
+        text = 'Palautetta FB messengeristä: '
         feedback['address_string'] = row.street_address
-        feedback['description'] = row.message
+        feedback['description'] = ('%s%s\nKuva: %s' % (text, row.message, row.media_url))
         feedback['lat'] = row.lat_coordinate
         feedback['long'] = row.long_coordinate
-        feedback['media_url'] = row.media_url
+        # feedback['media_url'] = row.media_url
         feedback['timestamp'] = row.source_created_at
         return feedback
 
