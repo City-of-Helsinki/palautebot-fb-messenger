@@ -287,7 +287,8 @@ class FbBotView(generic.View):
         # and returns feedback dictionary
         text = 'Palautetta Facebook messengeristä: '
         feedback['address_string'] = row.street_address
-        feedback['description'] = ('%s%s\nKuva: %s' % (text, row.message, row.media_url))
+        # feedback['description'] = ('%s%s\nKuva: %s' % (text, row.message, row.media_url))
+        feedback['description'] = ('%s%s\nKuva: https://www.google.fi/' % (text, row.message))
         feedback['lat'] = row.lat_coordinate
         feedback['long'] = row.long_coordinate
         feedback['media_url'] = row.media_url
