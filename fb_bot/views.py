@@ -249,7 +249,7 @@ class FbBotView(generic.View):
         feedback['api_key'] = settings.HELSINKI_API_KEY
         feedback['service_code'] = settings.HELSINKI_API_SERVICE_CODE
         if settings.DEBUG:
-            pprint('Information to the API: %s') % (feedback)
+            pprint('Information to the API: %s' % (feedback))
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         response_new_ticket = requests.post(
             settings.HELSINKI_POST_API_URL,
@@ -261,8 +261,8 @@ class FbBotView(generic.View):
             pprint(new_ticket)
         for entry in new_ticket:
             if 'code' in entry:
-                pprint('ERROR: %s') %(entry['code'])
-                pprint('info: %s') %(entry['description'])
+                pprint('ERROR: %s' %(entry['code']))
+                pprint('info: %s' %(entry['description']))
                 return url_to_feedback
             elif 'service_request_id' in entry:
                 break
