@@ -107,8 +107,8 @@ class FbBotView(generic.View):
             media_count = 0
             for attachment in user_input:
                 try:
-                    if (attachment['type'] == 'image'
-                    or attachment['type'] == 'video'):
+                    if (attachment['type'] == 'image'or
+                            attachment['type'] == 'video'):
                         if 'url' in attachment['payload']:
                             media_count = media_count+1
                         else:
@@ -126,8 +126,8 @@ class FbBotView(generic.View):
         elif phase == 4:
             for attachment in user_input:
                 try:
-                    if ('lat' in attachment['payload']['coordinates']
-                    and 'long' in attachment['payload']['coordinates']):
+                    if ('lat' in attachment['payload']['coordinates']and
+                            'long' in attachment['payload']['coordinates']):
                         return 1
                     else:
                         return 0
@@ -145,9 +145,6 @@ class FbBotView(generic.View):
         # they are handled in POST function
         else:
             return 1
-
-
-
 
     def get_temp_row(self, message):
         # Function creates and returns a temporary database row
@@ -238,12 +235,14 @@ class FbBotView(generic.View):
         elif phase == 3:
             Feedback.objects.filter(id=id).update(phase=phase)
         elif phase == 4:
-            Feedback.objects.filter(id=id).update(phase=phase, lat_coordinate='', long_coordinate='')
+            Feedback.objects.filter(id=id).update(
+                phase=phase,
+                lat_coordinate='',
+                long_coordinate='')
         elif phase == 5:
             Feedback.objects.filter(id=id).update(phase=phase)
         elif phase == 6:
             Feedback.objects.filter(id=id).update(phase=phase, address='')
-
 
     def save_to_hki_database(self, feedback):
         # Send information to HKI database and returns url to the feedback
@@ -252,35 +251,40 @@ class FbBotView(generic.View):
         if settings.DEBUG:
             pprint('Information to the API: ', feedback)
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        response_new_ticket = requests.post(settings.HELSINKI_POST_API_URL,
-            data=feedback, headers=headers)
+        response_new_ticket = requests.post(
+            settings.HELSINKI_POST_API_URL,
+            data=feedback,
+            headers=headers)
         url_to_feedback = ''
         new_ticket = response_new_ticket.json()
         if settings.DEBUG:
             pprint(new_ticket)
         for entry in new_ticket:
             if 'code' in entry:
-                print('ERROR: ', entry['code'])
-                print('info: ', entry['description'])
+                pprint('ERROR: ', entry['code'])
+                pprint('info: ', entry['description'])
                 return url_to_feedback
             elif 'service_request_id' in entry:
                 break
             else:
-                print('something wrong with api data')
-                print(entry)
+                pprint('something wrong with api data')
+                pprint(entry)
                 return url_to_feedback
         try:
             new_ticket_id = new_ticket[0]['service_request_id']
             if new_ticket_id == 'failureCode':
                 return url_to_feedback
             else:
-                url_to_feedback = 'https://www.hel.fi/helsinki/fi/kaupunki-ja-hallinto/osallistu-ja-vaikuta/palaute/nayta-palaute?fid=%s' % (new_ticket_id)
+                url1 = 'https://www.hel.fi/helsinki/fi/kaupunki-ja-hallinto'
+                url2 = '/osallistu-ja-vaikuta/palaute/nayta-palaute?fid='
+                url_to_feedback = '%s%s%s' % (url1, url2, new_ticket_id)
         except KeyError as e:
-            print('New data doesn\'t contain service_request_id %s' % (new_ticket))
+            pprint('No service_request_id in new data: %s' % (new_ticket))
         return url_to_feedback
 
     def prepare_ticket(self, feedback, row):
-        # Assigns information from database to feedback dictionary and returns feedback dictionary
+        # Assigns information from database to feedback dictionary
+        # and returns feedback dictionary
         feedback['address_string'] = row.street_address
         feedback['description'] = row.message
         feedback['lat'] = row.lat_coordinate
@@ -302,13 +306,9 @@ class FbBotView(generic.View):
                 # Check to make sure the received call is a message call
                 # This might be delivery, optin, postback for other events
                 if 'message' in message:
-                    bot_answer = ''
-                    query_response = ''
-                    msg1 = ''
-                    msg2 = ''
-                    msg3 = ''
-                    msg4 = ''
-                    msg5 = ''
+                    bot_answer, query_response = '', ''
+                    msg1, msg2, msg3 = '', '', ''
+                    msg4, msg5, msg6 = '', '', ''
                     pprint("LET'S GET PHASE NOW!")
                     row = self.get_temp_row(message)
                     feedback['phase'] = self.get_phase(message)
@@ -322,14 +322,16 @@ class FbBotView(generic.View):
                         bot_answers
                         )
                     if (input_valid == 1 or input_valid == 2 or
-                        input_valid == 3):
+                            input_valid == 3):
                         pprint('check_input == true')
                         row = self.get_temp_row(message)
                         user = row.user_id
                         prev_row = self.get_feedback_to_update(user)
                         if input_valid == 3:
                             feedback['phase'] -= 1
-                            self.cancel_previous_step(feedback['phase'], prev_row.id)
+                            self.cancel_previous_step(
+                                feedback['phase'],
+                                prev_row.id)
                             bot_answer = bot_answers[feedback['phase']]
                             post_facebook_message(
                                     message['sender']['id'],
@@ -362,10 +364,10 @@ class FbBotView(generic.View):
                         elif feedback['phase'] == 2:
                             pprint('THIS IS PHASE 2')
                             for attachment in (message['message']
-                            ['attachments']):
+                                                      ['attachments']):
                                 if 'url' in attachment['payload']:
                                     feedback['url'] = (attachment['payload']
-                                    ['url'])
+                                                                 ['url'])
                                     break
                             feedback['phase'] = feedback['phase']+1
                             query_response = Feedback.objects.filter(
@@ -388,13 +390,15 @@ class FbBotView(generic.View):
                         elif feedback['phase'] == 4:
                             pprint('THIS IS PHASE 4')
                             for attachment in (message['message']
-                            ['attachments']):
+                                                      ['attachments']):
                                 if 'lat' in (attachment['payload']
-                                ['coordinates']):
+                                                       ['coordinates']):
                                     feedback['lat'] = (attachment['payload']
-                                    ['coordinates']['lat'])
+                                                       ['coordinates']
+                                                       ['lat'])
                                     feedback['long'] = (attachment['payload']
-                                    ['coordinates']['long'])
+                                                        ['coordinates']
+                                                        ['long'])
                                     feedback['phase'] = feedback['phase']+1
                                     break
                             query_response = Feedback.objects.filter(
@@ -412,16 +416,19 @@ class FbBotView(generic.View):
                                 bot_answer = bot_answers[feedback['phase']]
                             elif input_valid == 2:
                                 feedback['phase'] = feedback['phase']+2
-                                feedback = self.prepare_ticket(feedback, prev_row)
+                                feedback = self.prepare_ticket(
+                                    feedback, prev_row)
                                 url = self.save_to_hki_database(feedback)
                                 if url != '':
-                                    msg1 = 'Kiitos palautteestasi! Voit seurata '
-                                    msg2 = 'palautteen käsittelyä oheisesta linkistä '
-                                    msg3 = '\n\nVoit aloittaa uuden palautteen kirjoit'
-                                    msg4 = 'tamalla sen lyhyesti tähän keskusteluun '
-                                    msg5 = '(10-5000 merkkiä)'
-                                    bot_answer = '%s%s%s%s%s%s' % (msg1, msg2, url,
-                                        msg3, msg4, msg5)
+                                    msg1 = 'Kiitos palautteestasi! Voit '
+                                    msg2 = 'seurata palautteen käsittelyä '
+                                    msg3 = 'oheisesta linkistä \n\nVoit '
+                                    msg4 = 'aloittaa uuden palautteen '
+                                    msg5 = 'kirjoittamalla sen lyhyesti tähän '
+                                    msg6 = 'keskusteluun (10-5000 merkkiä)'
+                                    bot_answer = '%s%s%s%s%s%s%s' % (
+                                        msg1, msg2, url, msg3, msg4, msg5,
+                                        msg6)
                                     query_response = Feedback.objects.filter(
                                         id=prev_row.id).update(
                                         phase=feedback['phase'],
@@ -429,20 +436,20 @@ class FbBotView(generic.View):
                                         )
                                 else:
                                     feedback['phase'] = 0
-                                    msg1 = 'Palautteen tallentaminen epäonnistui.'
-                                    msg2 = '\n\nVoit yrittää uudelleen kirjoit'
-                                    msg3 = 'tamalla palautteesi lyhyesti tähän '
-                                    msg4 = 'keskusteluun (10-5000 merkkiä).'
-                                    bot_answer = '%s%s%s%s' % (msg1,
-                                        msg2, msg3, msg4)
+                                    msg1 = 'Palautteen tallentaminen epäonnist'
+                                    msg2 = 'ui.\n\nVoit yrittää uudelleen kirj'
+                                    msg3 = 'oittamalla palautteesi lyhyesti tä'
+                                    msg4 = 'hän keskusteluun (10-5000 merkkiä)'
+                                    bot_answer = '%s%s%s%s' % (
+                                        msg1, msg2, msg3, msg4)
                                     query_response = Feedback.objects.filter(
                                         id=prev_row.id).update(
                                         phase=0,
-                                        message = '',
-                                        lat_coordinate = '',
-                                        long_coordinate = '',
-                                        media_url = '',
-                                        street_address = '',
+                                        message='',
+                                        lat_coordinate='',
+                                        long_coordinate='',
+                                        media_url='',
+                                        street_address='',
                                         ready=False)
                             query_response = Feedback.objects.filter(
                                 id=prev_row.id).update(phase=feedback['phase'])
@@ -450,16 +457,19 @@ class FbBotView(generic.View):
                         elif feedback['phase'] == 6:
                             pprint('THIS IS PHASE 6')
                             feedback = self.prepare_ticket(feedback, prev_row)
-                            feedback['address_string'] = message['message']['text']
+                            feedback['address_string'] = (message['message']
+                                                                 ['text'])
                             url = self.save_to_hki_database(feedback)
                             if url != '':
-                                msg1 = 'Kiitos palautteestasi! Voit seurata '
-                                msg2 = 'palautteen käsittelyä oheisesta linkistä '
-                                msg3 = '\n\nVoit aloittaa uuden palautteen kirjoit'
-                                msg4 = 'tamalla sen lyhyesti tähän keskusteluun '
-                                msg5 = '(10-5000 merkkiä)'
-                                bot_answer = '%s%s%s%s%s%s' % (msg1, msg2, url,
-                                    msg3, msg4, msg5)
+                                msg1 = 'Kiitos palautteestasi! Voit '
+                                msg2 = 'seurata palautteen käsittelyä '
+                                msg3 = 'oheisesta linkistä \n\nVoit '
+                                msg4 = 'aloittaa uuden palautteen '
+                                msg5 = 'kirjoittamalla sen lyhyesti tähän '
+                                msg6 = 'keskusteluun (10-5000 merkkiä)'
+                                bot_answer = '%s%s%s%s%s%s%s' % (
+                                    msg1, msg2, url, msg3, msg4, msg5,
+                                    msg6)
                                 feedback['phase'] = 0
                                 query_response = Feedback.objects.filter(
                                     id=prev_row.id).update(
@@ -473,16 +483,16 @@ class FbBotView(generic.View):
                                 msg2 = '\n\nVoit yrittää uudelleen kirjoit'
                                 msg3 = 'tamalla palautteesi lyhyesti tähän '
                                 msg4 = 'keskusteluun (10-5000 merkkiä).'
-                                bot_answer = '%s%s%s%s' % (msg1,
-                                    msg2, msg3, msg4)
+                                bot_answer = '%s%s%s%s' % (
+                                    msg1, msg2, msg3, msg4)
                                 query_response = Feedback.objects.filter(
                                     id=prev_row.id).update(
                                     phase=0,
-                                    message = '',
-                                    lat_coordinate = '',
-                                    long_coordinate = '',
-                                    media_url = '',
-                                    street_address = '',
+                                    message='',
+                                    lat_coordinate='',
+                                    long_coordinate='',
+                                    media_url='',
+                                    street_address='',
                                     ready=False)
 
                         elif feedback['phase'] == 9:
@@ -495,18 +505,18 @@ class FbBotView(generic.View):
                             query_response = Feedback.objects.filter(
                                 id=prev_row.id).update(
                                 phase=0,
-                                message = '',
-                                lat_coordinate = '',
-                                long_coordinate = '',
-                                media_url = '',
-                                street_address = '',
+                                message='',
+                                lat_coordinate='',
+                                long_coordinate='',
+                                media_url='',
+                                street_address='',
                                 ready=False)
                             msg1 = 'Palautteen tallentaminen epäonnistui.'
                             msg2 = '\n\nVoit yrittää uudelleen kirjoit'
                             msg3 = 'tamalla palautteesi lyhyesti tähän '
                             msg4 = 'keskusteluun(10-5000 merkkiä).'
-                            bot_answer = '%s%s%s%s' % (msg1,
-                                msg2, msg3, msg4)
+                            bot_answer = '%s%s%s%s' % (
+                                msg1, msg2, msg3, msg4)
                         post_facebook_message(
                             message['sender']['id'],
                             bot_answer
@@ -523,13 +533,13 @@ class FbBotView(generic.View):
                             else:
                                 if feedback['phase'] == 0:
                                     msg1 = 'Virheellinen syöte.'
-                                    msg2 = ''
                                 else:
                                     msg1 = 'Virheellinen syöte, voit peruuttaa'
-                                    msg2 = 'tämän vaiheen kirjoittamalla \'peruuta\''
-                                msg3 = bot_answers[feedback['phase']]
-                                bot_answer = '%s %s\n\n %s' % (
-                                    msg1, msg2, msg3)
+                                    msg2 = 'tämän vaiheen kirjoittamalla '
+                                    msg3 = '\'peruuta\''
+                                msg4 = bot_answers[feedback['phase']]
+                                bot_answer = '%s %s%s\n\n %s' % (
+                                    msg1, msg2, msg3, msg4)
                                 post_facebook_message(
                                     message['sender']['id'],
                                     bot_answer
