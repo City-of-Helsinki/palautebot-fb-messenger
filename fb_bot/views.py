@@ -217,11 +217,11 @@ class FbBotView(generic.View):
         # index numbers. ---> bot_answers[currentPhase]
         answers = [
             'Kirjoita lyhyesti palautteesi (10-5000 merkkiä)',
-            'Haluatko lisätä kuvan palautteeseen (kyllä/ei)?',
+            'Haluaisitko lisätä kuvan palautteeseen? Vastaa ensin kyllä/ei ja lisää sitten mahdollinen kuva.',
             'Liitä kuva',
-            'Haluatko lisätä sijantitiedon palautteeseen (kyllä/ei)?',
+            'Haluaisitko lisätä palautteeseen sijantitiedon? Vastaa ensin kyllä/ei ja lisää sitten mahdollinen sijaintitieto.',
             'Liitä sijainti puhelimestasi',
-            'Haluatko lisätä osoitteen tai lisätietoja paikasta(kyllä/ei)?',
+            'Haluaisitko vielä lisätä osoitteen tai lisätietoja paikasta? Vastaa ensin kyllä/ei ja lisää sitten mahdollinen lisätieto paikasta.',
             'Kirjoita osoite tai lisätiedot paikasta (10-5000 merkkiä)', ]
         return answers
 
@@ -427,9 +427,14 @@ class FbBotView(generic.View):
                                     msg4 = 'aloittaa uuden palautteen '
                                     msg5 = 'kirjoittamalla sen lyhyesti tähän '
                                     msg6 = 'keskusteluun (10-5000 merkkiä)'
+                                    msg7 = '\n\nKaupungin työntekijät antavat'
+                                    msg8 = ' tietoa ja neuvontaa kaupungin'
+                                    msg9 = ' palveluista arkipäivisin'
+                                    msg10 = ' (ma-to 9-16 ja pe 9-15).'
+                                    msg11 = ' Neuvonta puh. 09 310 1111.'
                                     bot_answer = '%s%s%s%s%s%s%s' % (
                                         msg1, msg2, url, msg3, msg4, msg5,
-                                        msg6)
+                                        msg6, msg7, msg8, msg9, msg10, msg11)
                                     query_response = Feedback.objects.filter(
                                         id=prev_row.id).update(
                                         phase=feedback['phase'],
@@ -440,7 +445,7 @@ class FbBotView(generic.View):
                                     msg1 = 'Palautteen tallentaminen epäonnist'
                                     msg2 = 'ui.\n\nVoit yrittää uudelleen kirj'
                                     msg3 = 'oittamalla palautteesi lyhyesti tä'
-                                    msg4 = 'hän keskusteluun (10-5000 merkkiä)'
+                                    msg4 = 'hän viestiketjuun (10-5000 merkkiä)'
                                     bot_answer = '%s%s%s%s' % (
                                         msg1, msg2, msg3, msg4)
                                     query_response = Feedback.objects.filter(
@@ -468,9 +473,17 @@ class FbBotView(generic.View):
                                 msg4 = 'aloittaa uuden palautteen '
                                 msg5 = 'kirjoittamalla sen lyhyesti tähän '
                                 msg6 = 'keskusteluun (10-5000 merkkiä)'
+                                msg7 = '\n\nKaupungin työntekijät antavat'
+                                msg8 = ' tietoa ja neuvontaa kaupungin'
+                                msg9 = ' palveluista arkipäivisin'
+                                msg10 = ' (ma-to 9-16 ja pe 9-15).'
+                                msg11 = ' Neuvonta puh. 09 310 1111.'
+                                msg12 = 'Voit kysyä kaupungin palveluista'
+                                msg13 = ' myös chatissa https://www.hel.fi'
+                                msg14 = '/kanslia/virka-fi/neuvonta'
                                 bot_answer = '%s%s%s%s%s%s%s' % (
                                     msg1, msg2, url, msg3, msg4, msg5,
-                                    msg6)
+                                    msg6, msg7, msg8, msg9, msg10, msg11)
                                 feedback['phase'] = 0
                                 query_response = Feedback.objects.filter(
                                     id=prev_row.id).update(
@@ -533,10 +546,10 @@ class FbBotView(generic.View):
                                 pass
                             else:
                                 if feedback['phase'] == 0:
-                                    msg1 = 'Virheellinen syöte.'
+                                    msg1 = 'Valitettavasti en pysty lukemaan sijaintitietoa.'
                                 else:
-                                    msg1 = 'Virheellinen syöte, voit peruuttaa'
-                                    msg2 = 'tämän vaiheen kirjoittamalla '
+                                    msg1 = 'Valitettavasti en pysty lukemaan sijaintitietoa. Voit ohittaa'
+                                    msg2 = 'tämän vaiheen tai yrittää uudelleen kirjoittamalla '
                                     msg3 = '\'peruuta\''
                                 msg4 = bot_answers[feedback['phase']]
                                 bot_answer = '%s %s%s\n\n %s' % (
@@ -546,6 +559,9 @@ class FbBotView(generic.View):
                                     bot_answer
                                     )
         return HttpResponse()
+
+
+
 
 
 def post_facebook_message(fbid, recevied_message):
