@@ -431,7 +431,7 @@ class FbBotView(generic.View):
                                     msg8 = ' tietoa ja neuvontaa kaupungin'
                                     msg9 = ' palveluista arkipäivisin'
                                     msg10 = ' (ma-to 9-16 ja pe 9-15).'
-                                    msg11 = ' Neuvonta puh. 09 310 1111.'
+                                    msg11 = ' Neuvonta puh. 09 310 111 11.'
                                     bot_answer = '%s%s%s%s%s%s%s' % (
                                         msg1, msg2, url, msg3, msg4, msg5,
                                         msg6, msg7, msg8, msg9, msg10, msg11)
@@ -477,7 +477,7 @@ class FbBotView(generic.View):
                                 msg8 = ' tietoa ja neuvontaa kaupungin'
                                 msg9 = ' palveluista arkipäivisin'
                                 msg10 = ' (ma-to 9-16 ja pe 9-15).'
-                                msg11 = ' Neuvonta puh. 09 310 1111.'
+                                msg11 = ' Neuvonta puh. 09 310 111 11.'
                                 msg12 = 'Voit kysyä kaupungin palveluista'
                                 msg13 = ' myös chatissa https://www.hel.fi'
                                 msg14 = '/kanslia/virka-fi/neuvonta'
